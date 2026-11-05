@@ -1,0 +1,1136 @@
+@if (isAdmin) {
+  <div class="admin-shell">
+    <aside class="admin-rail">
+      <a class="brand brand-light" href="/" (click)="closeAdminDesk($event)" aria-label="She Stands public site">
+        <span><strong>SHE STANDS</strong><small>CURATOR DESK</small></span>
+      </a>
+      @if (adminToken) {
+        <p class="rail-label">Workspace</p>
+        <button class="rail-link" [class.active]="adminTab === 'overview'" (click)="adminTab = 'overview'">◫ &nbsp; Overview</button>
+        <button class="rail-link" [class.active]="adminTab === 'donations'" (click)="adminTab = 'donations'">♡ &nbsp; Donations</button>
+        <button class="rail-link" [class.active]="adminTab === 'media'" (click)="adminTab = 'media'">▧ &nbsp; Media archive</button>
+        <button class="rail-link" [class.active]="adminTab === 'stories'" (click)="adminTab = 'stories'">✎ &nbsp; Story submissions</button>
+        <button class="rail-link" [class.active]="adminTab === 'messages'" (click)="adminTab = 'messages'">✉ &nbsp; Messages</button>
+        <button class="rail-link" [class.active]="adminTab === 'socials'" (click)="adminTab = 'socials'">↗ &nbsp; Social links</button>
+      }
+      <div class="rail-bottom">
+        <a href="/" (click)="closeAdminDesk($event)">← &nbsp; View public site</a>
+        @if (adminToken) { <button (click)="logout()">Sign out</button> }
+      </div>
+    </aside>
+    <main class="admin-main">
+      @if (!adminToken) {
+        <section class="login-card">
+          <span class="eyebrow">CURATOR ACCESS</span>
+          <h1>Good work begins with listening.</h1>
+          <p>Sign in to review support, archive stories, manage media and respond to visitors.</p>
+          <form (ngSubmit)="login()">
+            <label>Administrator password
+              <input type="password" [(ngModel)]="adminPassword" name="password" placeholder="Enter curator password (shestands2026)" autocomplete="current-password" required>
+            </label>
+            <small style="color: #686961; font-size: 11.5px;">Default curator password: <code>shestands2026</code></small>
+            <button class="button button-green" type="submit">ENTER THE ARCHIVE</button>
+          </form>
+          @if (adminError) { <p class="form-error">{{ adminError }}</p> }
+        </section>
+      } @else {
+        <header class="admin-top">
+          <div>
+            <span class="eyebrow">SHE STANDS · CURATOR DESK</span>
+            <h1>{{ adminTab === 'overview' ? 'A view of the work' : adminTab === 'donations' ? 'Support ledger' : adminTab === 'media' ? 'Media archive' : adminTab === 'stories' ? 'Stories to review' : adminTab === 'messages' ? 'Visitor conversations' : 'Social channels' }}</h1>
+          </div>
+          <span class="live-dot">Connected</span>
+        </header>
+        @if (adminNotice) {
+          <div class="notice-banner">{{ adminNotice }}<button (click)="adminNotice = ''" aria-label="Dismiss">×</button></div>
+        }
+        @if (adminTab === 'overview') {
+          <section class="stat-grid">
+            <article class="stat-card"><span>Gifts received</span><strong>{{ adminStats.paidDonations || 0 }}</strong><small>Verified contributions</small></article>
+            <article class="stat-card"><span>Awaiting review</span><strong>{{ adminStats.pendingDonations || 0 }}</strong><small>Payment references to check</small></article>
+            <article class="stat-card"><span>Stories to read</span><strong>{{ adminStats.pendingStories || 0 }}</strong><small>Shared with consent</small></article>
+            <article class="stat-card"><span>Visitor notes</span><strong>{{ adminStats.unreadMessages || 0 }}</strong><small>Conversation threads</small></article>
+          </section>
+          <section class="admin-panel">
+            <div class="panel-heading">
+              <div><span class="eyebrow">RECENT ACTIVITY</span><h2>Latest gifts</h2></div>
+              <button class="text-link" (click)="adminTab = 'donations'">Open ledger →</button>
+            </div>
+            @for (gift of adminDonations.slice(0, 5); track gift._id) {
+              <div class="data-row">
+                <div><strong>{{ gift.name }}</strong><small>{{ gift.email }} · {{ gift.paymentMethod || 'stripe' }} · {{ gift.frequency }}</small></div>
+                <b>{{ gift.currency?.toUpperCase() }} {{ gift.amount }}</b>
+                <span class="status-pill" [class.paid]="gift.status === 'paid'">{{ gift.status }}</span>
+              </div>
+            }
+            @if (!adminDonations.length) { <p class="empty-state">No contributions have been recorded yet.</p> }
+          </section>
+          <section class="admin-panel">
+            <div class="panel-heading">
+              <div><span class="eyebrow">KEEP IN TOUCH</span><h2>Recent conversations</h2></div>
+              <button class="text-link" (click)="adminTab = 'messages'">Open inbox →</button>
+            </div>
+            @for (thread of adminMessages.slice(0, 3); track thread._id) {
+              <div class="data-row">
+                <div><strong>{{ thread.name }}</strong><small>{{ thread.email }}</small></div>
+                <span class="row-preview">{{ thread.messages?.[thread.messages.length - 1]?.text }}</span>
+              </div>
+            }
+            @if (!adminMessages.length) { <p class="empty-state">Your inbox is clear.</p> }
+          </section>
+        }
+        @if (adminTab === 'donations') {
+          <section class="admin-panel">
+            <div class="panel-heading">
+              <div><span class="eyebrow">MONGO DB · PAYMENT LEDGER</span><h2>Donation records</h2></div>
+              <span class="status-pill">{{ adminDonations.length }} records</span>
+            </div>
+            <p class="panel-intro">Stripe, Google Pay and PayPal confirm successful checkout automatically. M-Pesa and manual reference receipts appear here for the museum team to reconcile before marking received.</p>
+            <div class="table-head"><span>Donor</span><span>Gift</span><span>Reference / status</span><span>Action</span></div>
+            @for (gift of adminDonations; track gift._id) {
+              <div class="donation-row">
+                <div><strong>{{ gift.name }}</strong><small>{{ gift.email }}</small><small>{{ gift.createdAt | date:'mediumDate' }} · {{ gift.paymentMethod || 'stripe' }}</small></div>
+                <strong>{{ gift.currency?.toUpperCase() }} {{ gift.amount }}<small>{{ gift.frequency }}</small></strong>
+                <div><span class="status-pill" [class.paid]="gift.status === 'paid'">{{ gift.status }}</span><small>{{ gift.paymentReference || gift.providerReference || gift.checkoutSessionId || 'Awaiting payment' }}</small></div>
+                @if (gift.status !== 'paid') { <button class="small-button" (click)="verifyDonation(gift._id)">Mark received</button> } @else { <span class="verified">✓ received</span> }
+              </div>
+            }
+            @if (!adminDonations.length) { <p class="empty-state">No donations yet. New gifts will appear here as soon as they are submitted.</p> }
+          </section>
+        }
+        @if (adminTab === 'media') {
+          <section class="admin-panel">
+            <div class="panel-heading">
+              <div><span class="eyebrow">CLOUDINARY LIBRARY</span><h2>Images, audio and files</h2></div>
+              <label class="button button-green upload-button">Add a file<input type="file" accept="image/*,audio/*,video/*,.pdf,.doc,.docx" (change)="uploadMedia($event)"></label>
+            </div>
+            <p class="panel-intro">Upload new museum files here, feature a homepage image, or set an oral history audio recording.</p>
+            <div class="media-grid">
+              @for (asset of adminMedia; track asset.publicId) {
+                <article class="media-tile">
+                  @if (asset.resourceType === 'image') { <img [src]="asset.url" [alt]="asset.name || 'Museum media'"> }
+                  @else { <div class="file-placeholder"><span>{{ asset.resourceType === 'video' ? '▶' : '♪' }}</span><small>{{ asset.format || asset.resourceType }}</small></div> }
+                  <div class="media-meta">
+                    <strong>{{ asset.name || asset.publicId }}</strong>
+                    <small>{{ asset.format }} · {{ asset.bytes / 1024 | number:'1.0-0' }} KB</small>
+                    <div class="media-actions">
+                      @if (asset.resourceType === 'image') { <button (click)="featureMedia(asset.url)">Feature on home</button> }
+                      @if (asset.resourceType === 'video' || asset.resourceType === 'raw') { <button (click)="featureAudio(asset.url)">Use as oral history audio</button> }
+                      <button class="danger-link" (click)="deleteMedia(asset.publicId)">Remove</button>
+                    </div>
+                  </div>
+                </article>
+              }
+            </div>
+            @if (!adminMedia.length) { <p class="empty-state">The Cloudinary library is empty. Configure credentials and upload a file to get started.</p> }
+          </section>
+        }
+        @if (adminTab === 'stories') {
+          <section class="admin-panel">
+            <div class="panel-heading"><div><span class="eyebrow">COMMUNITY ARCHIVE</span><h2>Submitted memories</h2></div></div>
+            @for (entry of adminStories; track entry._id) {
+              <article class="review-card">
+                <div class="review-head">
+                  <div><span class="eyebrow">{{ entry.theme || 'Community story' }} · {{ entry.place }}</span><h3>{{ entry.name }}</h3></div>
+                  <span class="status-pill" [class.paid]="entry.status === 'published'">{{ entry.status }}</span>
+                </div>
+                <p>{{ entry.story }}</p>
+                <small>Relationship: {{ entry.relationship }} · permission: {{ entry.consent ? 'confirmed' : 'not confirmed' }}</small>
+                @if (entry.fileUrl) { <a class="text-link" [href]="entry.fileUrl" target="_blank" rel="noreferrer">Open submitted file ↗</a> }
+                <div class="review-actions">
+                  <button class="small-button" (click)="reviewStory(entry._id, 'published')">Approve for archive</button>
+                  <button class="small-button ghost-button" (click)="reviewStory(entry._id, 'rejected')">Decline</button>
+                </div>
+              </article>
+            }
+            @if (!adminStories.length) { <p class="empty-state">There are no submissions to review.</p> }
+          </section>
+        }
+        @if (adminTab === 'messages') {
+          <section class="admin-panel">
+            <div class="panel-heading"><div><span class="eyebrow">PRIVATE VISITOR NOTES</span><h2>Conversations</h2></div></div>
+            @for (thread of adminMessages; track thread._id) {
+              <article class="thread-card">
+                <div class="review-head"><div><h3>{{ thread.name }}</h3><small>{{ thread.email }} · {{ thread.updatedAt | date:'medium' }}</small></div></div>
+                <div class="thread-history">
+                  @for (message of thread.messages; track $index) {
+                    <div class="thread-message" [class.from-team]="message.from === 'team'">
+                      <b>{{ message.from === 'team' ? 'Museum team' : thread.name }}</b>
+                      <span>{{ message.text }}</span>
+                    </div>
+                  }
+                </div>
+                <form class="reply-form" (ngSubmit)="replyMessage(thread)">
+                  <input [(ngModel)]="adminReply[thread._id]" [name]="'reply-' + thread._id" placeholder="Write a thoughtful reply…" required>
+                  <button class="small-button">Send reply</button>
+                </form>
+              </article>
+            }
+            @if (!adminMessages.length) { <p class="empty-state">No visitor messages have arrived yet.</p> }
+          </section>
+        }
+        @if (adminTab === 'socials') {
+          <section class="admin-panel">
+            <div class="panel-heading">
+              <div><span class="eyebrow">PUBLIC CHANNELS</span><h2>Where to find us</h2></div>
+              <button class="button button-green" (click)="saveSocials()">Save links</button>
+            </div>
+            <p class="panel-intro">Only publish channels the museum owns. Changes appear in the public contact section.</p>
+            @for (social of adminSocials; track $index; let i = $index) {
+              <div class="social-edit">
+                <div><strong>{{ social.name }}</strong><small>{{ social.url }}</small></div>
+                <button class="danger-link" (click)="removeSocial(i)">Remove</button>
+              </div>
+            }
+            <form class="social-add" (ngSubmit)="addSocial()">
+              <label>Channel<input [(ngModel)]="socialDraft.name" name="socialName" placeholder="@sswomensmuseum.ss" required></label>
+              <label>URL<input [(ngModel)]="socialDraft.url" name="socialUrl" type="url" placeholder="https://…" required></label>
+              <button class="small-button">Add channel</button>
+            </form>
+          </section>
+        }
+      }
+    </main>
+  </div>
+} @else {
+  <!-- TOP NAVIGATION BAR (Matches PDF Header on every page) -->
+  <header class="site-header">
+    <a class="brand" href="#home" (click)="jump('home'); $event.preventDefault()" aria-label="She Stands Women's Museum home">
+      <strong>SHE STANDS</strong>
+      <small>WOMEN'S MUSEUM</small>
+    </a>
+
+    <button class="menu-toggle" (click)="navOpen = !navOpen" [attr.aria-expanded]="navOpen" aria-label="Toggle navigation">
+      <span></span><span></span>
+    </button>
+
+    <nav [class.open]="navOpen" aria-label="Main navigation">
+      @for (item of navItems; track item[1]) {
+        <a [href]="'#' + item[1]" [class.active]="activeNav === item[1]" (click)="jump(item[1]); $event.preventDefault()">{{ item[0] }}</a>
+      }
+    </nav>
+
+    <div class="header-actions">
+      <button class="search-trigger" type="button" (click)="globalSearchOpen = true" aria-label="Search the archive">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+          <circle cx="10.5" cy="10.5" r="6.5"></circle>
+          <line x1="15.5" y1="15.5" x2="21" y2="21"></line>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <!-- PAGE 1: HOME / HERO -->
+    <section class="hero" id="home">
+      <img class="hero-photo" [src]="heroOverride || heroImage" alt="An elder and a young South Sudanese woman standing together in the She Stands Women's Museum gallery">
+      <div class="hero-wash"></div>
+
+      <div class="hero-copy">
+        <span class="pill-badge">PRESERVING • HONORING • EMPOWERING</span>
+        <h1>A LIVING TRIBUTE<br>TO THE WOMEN WHO<br>BUILT SOUTH SUDAN</h1>
+        <p class="hero-deck">Discover the voices, courage, culture and leadership of South Sudanese women - past, present and future.</p>
+        <div class="button-row">
+          <a class="button button-clay" href="#stories" (click)="jump('stories'); $event.preventDefault()">EXPLORE HER STORIES</a>
+          <a class="button button-cream" href="#visit" (click)="jump('visit'); $event.preventDefault()">PLAN YOUR VISIT</a>
+        </div>
+      </div>
+
+      <aside class="now-card">
+        <span class="eyebrow">NOW SHOWING</span>
+        <h2>Daughters of the Struggle</h2>
+        <p>Women of liberation, resistance and nation-building.</p>
+        <a href="#exhibitions" (click)="jump('exhibitions'); $event.preventDefault()">VIEW EXHIBITION <span>→</span></a>
+      </aside>
+    </section>
+
+    <!-- PAGE 2: ABOUT THE MUSEUM -->
+    <section class="about-pdf-section" id="about">
+      <!-- Left Full-Height Dark Green Panel -->
+      <div class="about-left-green">
+        <div class="about-left-top">
+          <span class="eyebrow gold-eyebrow underlined-eyebrow">ABOUT THE MUSEUM</span>
+          <h2 class="about-huge-title">SHE STANDS</h2>
+          <p class="about-lead">A living institution dedicated to preserving, honoring and sharing the stories of South Sudanese women.</p>
+        </div>
+
+        <div class="about-left-middle">
+          <span class="eyebrow gold-eyebrow">OUR PURPOSE</span>
+          <p>To document sacrifice, resilience, leadership, peacebuilding, cultural continuity and nation-building.</p>
+        </div>
+
+        <div class="about-left-bottom">
+          <strong>RECOGNIZING HER PAST.</strong>
+          <strong>CELEBRATING HER PRESENT.</strong>
+          <strong>BUILDING HER FUTURE.</strong>
+        </div>
+      </div>
+
+      <!-- Right Side: Top Row (Gallery Banners Image + Warm Sand Promise Panel) & Bottom Row (01 / 02 / 03) -->
+      <div class="about-right-area">
+        <div class="about-top-split">
+          <div class="about-center-photo">
+            <img src="assets/pdf-banners.png" alt="Exhibition banners inside the She Stands Women's Museum">
+          </div>
+          <div class="about-promise-panel">
+            <span class="eyebrow underlined-eyebrow">OUR PROMISE</span>
+            <h3>Her story belongs<br>in the national story.</h3>
+            <p>The museum is a place of remembrance and discovery - connecting elders, young people, researchers, artists, educators and communities.</p>
+            <button type="button" class="button button-clay" (click)="openAboutStoryModal()">READ OUR STORY</button>
+          </div>
+        </div>
+
+        <div class="about-pillars-row">
+          <article class="about-pillar">
+            <span class="pillar-num">01</span>
+            <h4>PRESERVE</h4>
+            <p>Oral histories, artifacts and memory.</p>
+          </article>
+          <article class="about-pillar">
+            <span class="pillar-num">02</span>
+            <h4>HONOR</h4>
+            <p>Women whose courage shaped a nation.</p>
+          </article>
+          <article class="about-pillar">
+            <span class="pillar-num">03</span>
+            <h4>EMPOWER</h4>
+            <p>New generations to speak and lead.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAGE 3: STORIES ARCHIVE -->
+    <section class="stories-pdf-section" id="stories">
+      <div class="stories-header-row">
+        <div class="stories-title-group">
+          <span class="eyebrow underlined-eyebrow">STORIES ARCHIVE</span>
+          <h2>Every woman carries history.</h2>
+          <p>Explore testimonies by theme, generation, place and contribution.</p>
+        </div>
+
+        <form class="stories-search-box" (ngSubmit)="$event.preventDefault()">
+          <input [(ngModel)]="storySearch" name="storySearch" placeholder="Search names, places or themes..." aria-label="Search stories">
+          <button type="submit">SEARCH</button>
+        </form>
+      </div>
+
+      <div class="stories-filter-pills" role="tablist" aria-label="Filter stories by theme">
+        @for (category of storyCategories; track category) {
+          <button
+            type="button"
+            [class.active]="storyCategory === category"
+            (click)="storyCategory = category">
+            {{ category }}
+          </button>
+        }
+      </div>
+
+      <div class="stories-four-grid">
+        @for (story of filteredStories; track story.id) {
+          <article class="pdf-story-card" [class.selected-story]="activeStory.id === story.id" (click)="selectStory(story)">
+            <div class="pdf-story-img">
+              <img [src]="story.image" [alt]="story.title">
+            </div>
+            <div class="pdf-story-body">
+              <span class="sage-pill">{{ story.tag }}</span>
+              <h3>{{ story.title }}</h3>
+              <p>{{ story.body }}</p>
+            </div>
+          </article>
+        } @empty {
+          <div class="empty-archive-box">
+            <p>No stories match “{{ storySearch }}” in {{ storyCategory }}. Try clearing the search filter.</p>
+            <button type="button" class="button button-clay" (click)="storySearch = ''; storyCategory = 'ALL STORIES'">SHOW ALL STORIES</button>
+          </div>
+        }
+      </div>
+    </section>
+
+    <!-- PAGE 4: ORAL HISTORY SPOTLIGHT ("ACHOL: LISTENING FOR PEACE") -->
+    <section class="spotlight-pdf-section" id="story-spotlight">
+      <div class="spotlight-left-photo">
+        <img [src]="activeStory.spotlightImage" [alt]="activeStory.title">
+      </div>
+
+      <div class="spotlight-right-panel">
+        <span class="sage-pill">{{ activeStory.SpotlightTag }}</span>
+        <h2 class="spotlight-heading">{{ activeStory.spotlightTitle }}</h2>
+        <blockquote class="spotlight-quote">{{ activeStory.quote }}</blockquote>
+
+        <div class="spotlight-divider"></div>
+
+        <div class="oral-player-wrap">
+          <span class="player-label">LISTEN TO THE ORAL HISTORY</span>
+          <div class="oral-pill-player">
+            <button type="button" class="play-circle-btn" (click)="toggleAudio()" [attr.aria-label]="isPlayingAudio ? 'Pause oral history' : 'Play oral history'">
+              @if (isPlayingAudio) {
+                <span>❚❚</span>
+              } @else {
+                <span>▶</span>
+              }
+            </button>
+            <div class="player-track" (click)="seekAudio($event)" role="slider" aria-label="Audio progress" [attr.aria-valuenow]="audioProgress">
+              <div class="player-fill" [style.width.%]="audioProgress"></div>
+            </div>
+            <span class="player-time">{{ formattedAudioTime }}</span>
+          </div>
+        </div>
+
+        <p class="spotlight-desc">{{ activeStory.spotlightBody }}</p>
+
+        <div class="spotlight-actions">
+          <button type="button" class="button button-green" (click)="openTranscriptModal()">VIEW TRANSCRIPT</button>
+          <a class="button button-outline" href="#stories" (click)="jump('stories'); $event.preventDefault()">EXPLORE RELATED STORIES</a>
+        </div>
+
+        <small class="archive-id">ARCHIVE ID {{ activeStory.archiveId }}</small>
+      </div>
+    </section>
+
+    <!-- PAGE 5: EXHIBITIONS ("THE MUSEUM, IN MANY VOICES") -->
+    <section class="exhibitions-pdf-section" id="exhibitions">
+      <div class="exhibitions-hero-banner">
+        <img src="assets/pdf-banners.png" alt="Museum exhibition banners gallery">
+        <div class="exhibitions-banner-wash"></div>
+        <div class="exhibitions-banner-copy">
+          <span class="eyebrow gold-eyebrow">EXHIBITIONS</span>
+          <span class="sub-eyebrow">PRESERVING • HONORING • EMPOWERING</span>
+          <h2>THE MUSEUM, IN MANY VOICES</h2>
+          <p>Permanent galleries and changing exhibitions connect personal testimony with the wider history of South Sudan.</p>
+          <a class="button button-clay" href="#visit" (click)="jump('visit'); $event.preventDefault()">PLAN YOUR VISIT</a>
+        </div>
+      </div>
+
+      <div class="exhibitions-cards-wrap">
+        <div class="exhibitions-four-grid">
+          @for (show of exhibitions; track show.name) {
+            <article class="pdf-exhibit-card" (click)="openExhibitionModal(show)">
+              <div [class]="'exhibit-header-bar ' + show.color">
+                <span>{{ show.state }}</span>
+              </div>
+              <div class="exhibit-card-body">
+                <h3>{{ show.name }}</h3>
+                <p>{{ show.note }}</p>
+                <button type="button" class="card-arrow-link" (click)="openExhibitionModal(show); $event.stopPropagation()">
+                  EXPLORE EXHIBITION <span>→</span>
+                </button>
+              </div>
+            </article>
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- PAGE 6: COLLECTIONS AND ARCHIVES ("HISTORY YOU CAN SEARCH.") -->
+    <section class="collections-pdf-section" id="collections">
+      <aside class="collections-dark-sidebar">
+        <span class="eyebrow gold-eyebrow underlined-gold">COLLECTIONS AND ARCHIVES</span>
+        <h2>HISTORY YOU<br>CAN SEARCH.</h2>
+        <p>Browse oral histories, photographs, personal papers, objects, songs and community records.</p>
+
+        <label class="collection-dark-search">
+          <input
+            type="search"
+            [(ngModel)]="collectionSearch"
+            (input)="showCollectionDrawer = true"
+            name="collectionSearch"
+            placeholder="Search the collection..."
+            aria-label="Search the collection">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="10.5" cy="10.5" r="6.5"></circle>
+            <line x1="15.5" y1="15.5" x2="21" y2="21"></line>
+          </svg>
+        </label>
+
+        <div class="browse-by-list">
+          <span class="browse-heading">BROWSE BY</span>
+          <button type="button" [class.active]="activeBrowseDimension === 'People'" (click)="browseCollectionBy('People')">
+            <span>People</span><b>→</b>
+          </button>
+          <button type="button" [class.active]="activeBrowseDimension === 'Places'" (click)="browseCollectionBy('Places')">
+            <span>Places</span><b>→</b>
+          </button>
+          <button type="button" [class.active]="activeBrowseDimension === 'Themes'" (click)="browseCollectionBy('Themes')">
+            <span>Themes</span><b>→</b>
+          </button>
+          <button type="button" [class.active]="activeBrowseDimension === 'Decades'" (click)="browseCollectionBy('Decades')">
+            <span>Decades</span><b>→</b>
+          </button>
+          <button type="button" [class.active]="activeBrowseDimension === 'Collection type'" (click)="browseCollectionBy('Collection type')">
+            <span>Collection type</span><b>→</b>
+          </button>
+        </div>
+      </aside>
+
+      <div class="collections-right-area">
+        <div class="collections-two-by-two">
+          @for (col of collections; track col.name) {
+            <article class="pdf-collection-card" [class.active-col]="activeCollectionFilter === col.key" (click)="exploreCollectionCategory(col.key)">
+              <div class="pdf-col-img">
+                <img [src]="col.image" [alt]="col.name">
+              </div>
+              <div class="pdf-col-footer">
+                <div class="pdf-col-meta">
+                  <span class="eyebrow">{{ col.name }}</span>
+                  <span class="col-records">{{ col.count }}</span>
+                </div>
+                <button type="button" class="col-explore-link">
+                  Explore collection <span>→</span>
+                </button>
+              </div>
+            </article>
+          }
+        </div>
+
+        @if (showCollectionDrawer || collectionSearch || activeCollectionFilter || activeBrowseDimension) {
+          <div class="archive-catalogue-drawer">
+            <div class="drawer-header">
+              <div>
+                <span class="eyebrow">ARCHIVAL CATALOGUE RECORDS {{ activeBrowseDimension ? '· BROWSE BY ' + activeBrowseDimension.toUpperCase() : '' }}</span>
+                <h3>{{ activeCollectionFilter || 'All Archival Holdings' }} ({{ filteredArchiveRecords.length }} catalogued items shown)</h3>
+              </div>
+              <button type="button" class="small-clear-btn" (click)="collectionSearch = ''; activeCollectionFilter = ''; activeBrowseDimension = ''; showCollectionDrawer = false">
+                Close catalogue ×
+              </button>
+            </div>
+            <div class="catalogue-items-grid">
+              @for (rec of filteredArchiveRecords; track rec.id) {
+                <article class="catalogue-record-card">
+                  <img [src]="rec.image" [alt]="rec.title">
+                  <div>
+                    <small class="rec-meta">{{ rec.id }} · {{ rec.type }} · {{ rec.place }} ({{ rec.decade }})</small>
+                    <h4>{{ rec.title }}</h4>
+                    <p>{{ rec.summary }}</p>
+                    <span class="rec-person">Associated person: <strong>{{ rec.person }}</strong> · Theme: {{ rec.theme }}</span>
+                  </div>
+                </article>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </section>
+
+    <!-- PAGE 7: LEARN AND RESEARCH ("Open the archive. Start a conversation.") -->
+    <section class="learn-pdf-section" id="learn">
+      <div class="learn-header-row">
+        <div class="learn-title-group">
+          <span class="eyebrow underlined-eyebrow">LEARN AND RESEARCH</span>
+          <h2>Open the archive. Start a conversation.</h2>
+          <p>Resources for classrooms, families, scholars and curious minds.</p>
+        </div>
+
+        <form class="learn-search-box" (ngSubmit)="$event.preventDefault()">
+          <input [(ngModel)]="resourceSearch" name="resourceSearch" placeholder="Search learning resources..." aria-label="Search learning resources">
+          <button type="submit">SEARCH</button>
+        </form>
+      </div>
+
+      <div class="learn-three-grid">
+        @for (resource of filteredResources; track resource.title) {
+          <article class="pdf-learn-card" (click)="openResourceModal(resource)">
+            <div [class]="'learn-top-bar ' + resource.color"></div>
+            <div class="learn-card-body">
+              <span [class]="'eyebrow learn-eyebrow-' + resource.color">{{ resource.audience }}</span>
+              <h3>{{ resource.title }}</h3>
+              <p>{{ resource.body }}</p>
+              <button type="button" class="card-arrow-link" (click)="openResourceModal(resource); $event.stopPropagation()">
+                VIEW RESOURCES <span>→</span>
+              </button>
+            </div>
+          </article>
+        }
+      </div>
+
+      <div class="oral-studio-banner">
+        <div class="oral-studio-copy">
+          <span class="eyebrow gold-eyebrow">ORAL HISTORY STUDIO</span>
+          <h3>Learn how to listen, record and preserve.</h3>
+          <p>Ethical interview guidance helps communities document women’s histories with consent, care and context.</p>
+        </div>
+        <button type="button" class="button button-clay" (click)="openOralHistoryGuide()">DOWNLOAD THE GUIDE</button>
+      </div>
+    </section>
+
+    <!-- PAGE 8: VISIT AND EVENTS ("COME CLOSER TO HER STORY") -->
+    <section class="visit-pdf-section" id="visit">
+      <div class="visit-left-banner">
+        <img src="assets/pdf-banners.png" alt="Gallery banners at the She Stands Women's Museum">
+        <div class="visit-banner-wash"></div>
+        <div class="visit-banner-copy">
+          <span class="pill-badge">VISIT AND EVENTS</span>
+          <h2>COME CLOSER<br>TO HER STORY</h2>
+          <p>Walk through living memory, listen to first-person testimony and encounter the creativity of South Sudanese women.</p>
+          <a class="button button-clay" href="https://maps.google.com/?q=Hai+Jalaba+Juba+South+Sudan" target="_blank" rel="noreferrer">GET DIRECTIONS</a>
+        </div>
+      </div>
+
+      <div class="visit-right-panel">
+        <div class="plan-visit-card">
+          <span class="eyebrow underlined-eyebrow">PLAN YOUR VISIT</span>
+          <div class="visit-info-grid">
+            <div>
+              <span class="eyebrow">LOCATION</span>
+              <strong>Hai Jalaba, South Sudan</strong>
+            </div>
+            <div>
+              <span class="eyebrow">CONTACT</span>
+              <strong>098 6600167 / 092 6600167</strong>
+            </div>
+            <div>
+              <span class="eyebrow">EMAIL</span>
+              <a href="mailto:info&#64;sswomensmuseum.org"><strong>info&#64;sswomensmuseum.org</strong></a>
+            </div>
+            <div class="visit-access-cell">
+              <div>
+                <span class="eyebrow">ACCESS</span>
+                <strong>Group and school visits</strong>
+              </div>
+              <button type="button" class="button button-green" (click)="openVisitModal('Group or Museum Visit')">PLAN A VISIT</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="upcoming-events-wrap">
+          <span class="eyebrow underlined-eyebrow">UPCOMING EVENTS</span>
+          <div class="events-stack">
+            @for (ev of events; track ev.title) {
+              <article class="pdf-event-row">
+                <div class="event-date-badge" [class.featured-date]="ev.featured">{{ ev.day }}</div>
+                <div class="event-info">
+                  <h3>{{ ev.title }}</h3>
+                  <p>{{ ev.note }}</p>
+                </div>
+                <button type="button" class="event-reserve-btn" (click)="openVisitModal(ev.title + ' (' + ev.day + ')')">
+                  RESERVE <span>→</span>
+                </button>
+              </article>
+            }
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAGE 9: GET INVOLVED / SHARE HER STORY ("Tell us about her") -->
+    <section class="involved-pdf-section" id="involved">
+      <div class="involved-left-col">
+        <div class="involved-top-photo">
+          <img src="assets/pdf-banners.png" alt="She Stands gallery exhibition panels">
+        </div>
+        <div class="involved-bottom-clay">
+          <span class="eyebrow gold-eyebrow underlined-gold">SHARE HER STORY</span>
+          <h2>A NAME.<br>A MEMORY.<br>A PLACE IN HISTORY.</h2>
+          <p>Help the museum document women whose courage, work and care shaped families, communities and the nation.</p>
+          <small>Every submission is reviewed with care and consent.</small>
+        </div>
+      </div>
+
+      <div class="involved-right-form">
+        <h2>Tell us about her</h2>
+        <p class="form-subtitle">You can save your progress and return later.</p>
+
+        <form (ngSubmit)="submitStory()">
+          <div class="pdf-form-grid">
+            <label>WOMAN'S NAME
+              <input [(ngModel)]="storyForm.name" name="storyName" placeholder="Full name" required>
+            </label>
+            <label>PLACE / COMMUNITY
+              <input [(ngModel)]="storyForm.place" name="storyPlace" placeholder="Town, state or community" required>
+            </label>
+            <label>YOUR RELATIONSHIP
+              <select [(ngModel)]="storyForm.relationship" name="storyRelationship" required>
+                <option value="" disabled>Choose relationship ▾</option>
+                <option>Daughter / Son / Grandchild</option>
+                <option>Sister / Family member</option>
+                <option>Colleague or Comrade</option>
+                <option>Friend or Neighbour</option>
+                <option>Community Researcher</option>
+              </select>
+            </label>
+            <label>STORY THEME
+              <select [(ngModel)]="storyForm.theme" name="storyTheme" required>
+                <option value="" disabled>Choose a theme ▾</option>
+                <option>Liberation</option>
+                <option>Peacebuilding</option>
+                <option>Culture</option>
+                <option>Education</option>
+                <option>Leadership</option>
+                <option>Nation-building</option>
+              </select>
+            </label>
+          </div>
+
+          <label class="full-field">HER STORY
+            <textarea [(ngModel)]="storyForm.story" name="storyText" placeholder="Share what you remember, what she did, and why it matters..." required></textarea>
+          </label>
+
+          <label class="full-field">UPLOAD PHOTOGRAPHS OR DOCUMENTS
+            <div class="pdf-file-box">
+              <input type="file" accept="image/*,audio/*,.pdf" (change)="rememberFile($event)" aria-label="Upload photographs or documents">
+              <span>{{ storyFile?.name || 'Add files (JPG, PNG, PDF, audio)' }}</span>
+            </div>
+          </label>
+
+          <label class="pdf-consent-row">
+            <input type="checkbox" [(ngModel)]="storyForm.consent" name="storyConsent" required>
+            <span>I confirm that I have permission to share this material and understand that the museum will review it before publication.</span>
+          </label>
+
+          <div class="pdf-form-buttons">
+            <button type="button" class="button button-outline" (click)="saveStoryDraft()">SAVE DRAFT</button>
+            <button type="submit" class="button button-green">SUBMIT FOR REVIEW</button>
+          </div>
+
+          @if (storyStatus) {
+            <p class="form-response">{{ storyStatus }}</p>
+          }
+        </form>
+      </div>
+    </section>
+
+    <!-- PAGE 10: SUPPORT THE MUSEUM ("HELP HER STORY STAND.") + OFFICIAL PAYMENT LOGOS -->
+    <section class="support-pdf-section" id="support">
+      <!-- Top Cream Half (Matches Page 10 of PDF) -->
+      <div class="support-top-cream">
+        <div class="support-top-left">
+          <span class="eyebrow underlined-eyebrow">SUPPORT THE MUSEUM</span>
+          <h2>HELP HER STORY STAND.</h2>
+          <p>Your support protects archives, records oral histories, welcomes school groups and creates space for women’s voices.</p>
+          <div class="button-row">
+            <button type="button" class="button button-clay" (click)="handleSupportAction('give')">SUPPORT THE MUSEUM</button>
+            <button type="button" class="button button-outline" (click)="handleSupportAction('partner')">BECOME A PARTNER</button>
+          </div>
+        </div>
+
+        <div class="support-top-right">
+          <img src="assets/pdf-support-hero.png" alt="Two generations of South Sudanese women standing in the museum">
+        </div>
+      </div>
+
+      <!-- Bottom Dark Green Half (Matches Page 10 of PDF) -->
+      <div class="support-bottom-green">
+        <div class="support-four-pillars">
+          @for (pillar of supportPillars; track pillar.num) {
+            <article class="support-pillar-card">
+              <span class="support-num">{{ pillar.num }}</span>
+              <h3>{{ pillar.title }}</h3>
+              <p>{{ pillar.body }}</p>
+              <button type="button" class="support-learn-link" (click)="handleSupportAction(pillar.action)">
+                LEARN MORE <span>→</span>
+              </button>
+            </article>
+          }
+        </div>
+
+        <div class="sponsor-row">
+          <div class="sponsor-callout">
+            <span class="eyebrow gold-eyebrow">FOUNDING SPONSOR AND FINANCIER</span>
+            <strong>The Achol Philip Foundation</strong>
+          </div>
+        </div>
+
+        <!-- Interactive Archive Support & Payment Checkout Studio (M-Pesa, Google Pay, PayPal, Stripe) -->
+        <div class="donation-studio-panel" id="donation-studio">
+          <div class="studio-left-info">
+            <span class="eyebrow gold-eyebrow">ARCHIVE SUPPORT CHECKOUT</span>
+            <h3>Make a direct contribution to She Stands.</h3>
+            <p>Every contribution goes directly toward oral history recording in South Sudan, archival conservation, and free school visits in Hai Jalaba.</p>
+            <div class="trust-badges">
+              <span>✓ Recorded in MongoDB Ledger</span>
+              <span>✓ Instant Curator Receipt</span>
+              <span>✓ Local & International Channels</span>
+            </div>
+          </div>
+
+          <div class="studio-checkout-card">
+            @if (donationState === 'form') {
+              <form (ngSubmit)="makeDonation()">
+                <span class="payment-label">SELECT OFFICIAL PAYMENT CHANNEL</span>
+                <div class="payment-options-four" role="group" aria-label="Choose payment method">
+                  <!-- Official M-Pesa Logo -->
+                  <button type="button" class="pay-tile" [class.selected]="donation.paymentMethod === 'mpesa'" (click)="choosePayment('mpesa')">
+                    <svg class="brand-logo-svg" viewBox="0 0 140 38" aria-label="M-Pesa">
+                      <rect x="2" y="5" width="24" height="28" rx="4" fill="#168540" />
+                      <rect x="6" y="9" width="16" height="12" rx="1.5" fill="#e8f5e9" />
+                      <path d="M2 19 L28 11 L26 24 Z" fill="#e31837" />
+                      <text x="34" y="25" font-family="Arial, sans-serif" font-weight="900" font-style="italic" font-size="18" fill="#168540" letter-spacing="-0.5">M-PESA</text>
+                    </svg>
+                    <small>Safaricom · KSh</small>
+                  </button>
+
+                  <!-- Official Google Pay Logo -->
+                  <button type="button" class="pay-tile" [class.selected]="donation.paymentMethod === 'google-pay'" (click)="choosePayment('google-pay')">
+                    <svg class="brand-logo-svg" viewBox="0 0 130 38" aria-label="Google Pay">
+                      <path d="M31.6 19.3c0-.9-.1-1.8-.2-2.6H19v5h7.1c-.3 1.6-1.2 3-2.6 3.9v3.2h4.2c2.5-2.3 3.9-5.7 3.9-9.5z" fill="#4285F4"/>
+                      <path d="M19 32c3.5 0 6.5-1.2 8.7-3.2l-4.2-3.2c-1.2.8-2.7 1.3-4.5 1.3-3.4 0-6.4-2.3-7.4-5.5H7.2v3.3C9.4 29.1 13.9 32 19 32z" fill="#34A853"/>
+                      <path d="M11.6 21.4c-.3-.8-.4-1.7-.4-2.6s.2-1.8.4-2.6v-3.3H7.2C6.3 14.7 5.8 16.8 5.8 18.8s.5 4.1 1.4 5.9l4.4-3.3z" fill="#FBBC05"/>
+                      <path d="M19 10.7c1.9 0 3.6.7 5 1.9l3.7-3.7C25.5 6.8 22.5 5.6 19 5.6c-5.1 0-9.6 2.9-11.8 7.3l4.4 3.3c1-3.2 4-5.5 7.4-5.5z" fill="#EA4335"/>
+                      <text x="40" y="25.5" font-family="'DM Sans', Arial, sans-serif" font-weight="700" font-size="19" fill="#3c4043">Pay</text>
+                    </svg>
+                    <small>Google Wallet · USD</small>
+                  </button>
+
+                  <!-- Official PayPal Logo -->
+                  <button type="button" class="pay-tile" [class.selected]="donation.paymentMethod === 'paypal'" (click)="choosePayment('paypal')">
+                    <svg class="brand-logo-svg" viewBox="0 0 135 38" aria-label="PayPal">
+                      <path d="M16.5 7h8.2c4.5 0 6.8 2.2 6.2 6.2-.7 4.7-3.8 7.3-8.3 7.3H19l-1.3 8.5h-4.6L16.5 7z" fill="#003087"/>
+                      <path d="M20.2 11.2h6.8c3.6 0 5.5 1.8 5 5.2-.6 3.9-3.1 6.1-6.8 6.1h-3l-1.1 7.5h-3.8l2.9-18.8z" fill="#0079C1" opacity="0.9"/>
+                      <text x="36" y="25" font-family="Arial, sans-serif" font-weight="800" font-style="italic" font-size="18.5" fill="#003087">Pay</text>
+                      <text x="69" y="25" font-family="Arial, sans-serif" font-weight="800" font-style="italic" font-size="18.5" fill="#0079C1">Pal</text>
+                    </svg>
+                    <small>PayPal Checkout</small>
+                  </button>
+
+                  <!-- Official Stripe Logo -->
+                  <button type="button" class="pay-tile" [class.selected]="donation.paymentMethod === 'stripe'" (click)="choosePayment('stripe')">
+                    <svg class="brand-logo-svg" viewBox="0 0 130 38" aria-label="Stripe">
+                      <rect x="6" y="6" width="118" height="26" rx="5" fill="#635BFF"/>
+                      <text x="65" y="24.5" text-anchor="middle" font-family="'DM Sans', Arial, sans-serif" font-weight="800" font-size="18" fill="#ffffff" letter-spacing="-0.4">stripe</text>
+                    </svg>
+                    <small>Card & Global · USD</small>
+                  </button>
+                </div>
+
+                <div class="gift-amounts">
+                  <button type="button" [class.selected]="donation.amount === (donation.paymentMethod === 'mpesa' ? 1500 : 15)" (click)="donation.amount = donation.paymentMethod === 'mpesa' ? 1500 : 15">
+                    {{ donation.paymentMethod === 'mpesa' ? 'KSh 1,500' : '$15' }}
+                  </button>
+                  <button type="button" [class.selected]="donation.amount === (donation.paymentMethod === 'mpesa' ? 3500 : 35)" (click)="donation.amount = donation.paymentMethod === 'mpesa' ? 3500 : 35">
+                    {{ donation.paymentMethod === 'mpesa' ? 'KSh 3,500' : '$35' }}
+                  </button>
+                  <button type="button" [class.selected]="donation.amount === (donation.paymentMethod === 'mpesa' ? 7500 : 75)" (click)="donation.amount = donation.paymentMethod === 'mpesa' ? 7500 : 75">
+                    {{ donation.paymentMethod === 'mpesa' ? 'KSh 7,500' : '$75' }}
+                  </button>
+                  <label class="custom-amount">
+                    {{ donation.paymentMethod === 'mpesa' ? 'KSh' : '$' }}
+                    <input type="number" min="1" max="100000" [(ngModel)]="donation.amount" name="amount" aria-label="Custom donation amount">
+                  </label>
+                </div>
+
+                <div class="donor-fields-grid">
+                  <label>YOUR NAME
+                    <input [(ngModel)]="donation.name" name="donorName" placeholder="Full name" autocomplete="name" required>
+                  </label>
+                  <label>EMAIL ADDRESS
+                    <input [(ngModel)]="donation.email" name="donorEmail" type="email" placeholder="you@example.com" autocomplete="email" required>
+                  </label>
+                </div>
+
+                @if (donation.paymentMethod === 'mpesa') {
+                  <label>M-PESA MOBILE NUMBER
+                    <input [(ngModel)]="donation.phone" name="donorPhone" type="tel" placeholder="0712 345 678" autocomplete="tel" required>
+                  </label>
+                }
+                @if (donation.paymentMethod === 'stripe' || donation.paymentMethod === 'google-pay') {
+                  <label>GIFT FREQUENCY
+                    <select [(ngModel)]="donation.frequency" name="frequency">
+                      <option value="once">One-time contribution</option>
+                      <option value="monthly">Monthly patron support</option>
+                    </select>
+                  </label>
+                }
+
+                <button class="button button-clay donate-submit" type="submit">
+                  CONTINUE WITH {{ donation.paymentMethod.toUpperCase() }} · {{ donation.paymentMethod === 'mpesa' ? 'KSh ' : '$' }}{{ donation.amount }}
+                </button>
+                @if (donationMessage) { <p class="form-error">{{ donationMessage }}</p> }
+              </form>
+            }
+            @if (donationState === 'pending') {
+              <div class="donation-confirm">
+                <span class="confirm-mark">✓</span>
+                <h3>Your gift pledge is recorded.</h3>
+                <p>{{ donationMessage }}</p>
+                <p class="reference-code">Archive Ledger Reference: <strong>{{ donationReference }}</strong></p>
+                <label>TRANSACTION / RECEIPT REFERENCE
+                  <input [(ngModel)]="donation.note" name="paymentReference" placeholder="Enter M-Pesa / Bank / Card receipt code">
+                </label>
+                <div class="button-row">
+                  <button class="button button-green" type="button" (click)="sendReference()">SUBMIT REFERENCE FOR VERIFICATION</button>
+                  <button class="button button-outline" type="button" (click)="donationState = 'form'">BACK</button>
+                </div>
+              </div>
+            }
+            @if (donationState === 'done') {
+              <div class="donation-confirm">
+                <span class="confirm-mark">✓</span>
+                <h3>Thank you for standing with her.</h3>
+                <p>{{ donationMessage }}</p>
+                <button class="button button-clay" type="button" (click)="donationState = 'form'">MAKE ANOTHER GIFT</button>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAGE 11: NEWS AND CONTACT ("WHAT IS HAPPENING AT SHE STANDS") -->
+    <section class="news-pdf-section" id="news">
+      <div class="news-header">
+        <span class="eyebrow underlined-eyebrow">NEWS AND CONTACT</span>
+        <h2>WHAT IS HAPPENING AT SHE STANDS</h2>
+      </div>
+
+      <div class="news-three-grid">
+        @for (item of news; track item.title) {
+          <article class="pdf-news-card" (click)="openNewsModal(item)">
+            <div class="pdf-news-img">
+              <img [src]="item.image" [alt]="item.title">
+            </div>
+            <div class="pdf-news-body">
+              <span class="eyebrow">{{ item.kicker }}</span>
+              <h3>{{ item.title }}</h3>
+              <p>{{ item.body }}</p>
+              <button type="button" class="card-arrow-link" (click)="openNewsModal(item); $event.stopPropagation()">
+                READ STORY <span>→</span>
+              </button>
+            </div>
+          </article>
+        }
+      </div>
+
+      <div class="news-bottom-split">
+        <div class="stay-connected-box">
+          <span class="eyebrow gold-eyebrow">STAY CONNECTED</span>
+          <h3>Stories, exhibitions and invitations.</h3>
+          <form (ngSubmit)="subscribe()">
+            <input type="email" [(ngModel)]="newsletterEmail" name="newsletterEmail" placeholder="Your email address" required aria-label="Your email address">
+            <button type="submit" class="button button-clay">SUBSCRIBE</button>
+          </form>
+          @if (newsletterStatus) {
+            <small class="newsletter-feedback">{{ newsletterStatus }}</small>
+          }
+        </div>
+
+        <div class="contact-museum-box">
+          <span class="eyebrow">CONTACT THE MUSEUM</span>
+          <a class="contact-big-email" href="mailto:info&#64;sswomensmuseum.org">info&#64;sswomensmuseum.org</a>
+          <p class="contact-phones">098 6600167 / 092 6600167</p>
+          <div class="contact-socials">
+            @for (social of socials; track social.url) {
+              <a [href]="social.url" target="_blank" rel="noreferrer">
+                {{ social.name.startsWith('@') ? social.name : '@sswomensmuseum.ss' }} <span>↗</span>
+              </a>
+            }
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER BAR (Matches PDF Footer on every page) -->
+  <footer class="pdf-footer">
+    <div class="pdf-footer-left">
+      <strong>SHE STANDS WOMEN'S MUSEUM</strong>
+      <span>Hai Jalaba, South Sudan &nbsp;|&nbsp; <a href="mailto:info&#64;sswomensmuseum.org">info&#64;sswomensmuseum.org</a> &nbsp;|&nbsp; 098 6600167 / 092 6600167</span>
+    </div>
+    <div class="pdf-footer-right">
+      <span>Supported and financed by The Achol Philip Foundation</span>
+      <a class="admin-discreet-link" href="/admin" (click)="openAdminDesk($event)">Curator Desk</a>
+    </div>
+  </footer>
+
+  <!-- INTERACTIVE MODALS (Transcript, Exhibition/Resource/News Reader, Visit Booking, Global Search) -->
+  @if (transcriptModalOpen) {
+    <div class="modal-backdrop" (click)="transcriptModalOpen = false">
+      <div class="archive-modal" (click)="$event.stopPropagation()">
+        <header class="modal-header">
+          <div>
+            <span class="eyebrow">ORAL HISTORY TRANSCRIPT · {{ activeStory.archiveId }}</span>
+            <h2>{{ activeStory.title }}</h2>
+            <small>{{ activeStory.narrator }} · Recorded in {{ activeStory.location }} ({{ activeStory.year }})</small>
+          </div>
+          <button type="button" class="modal-close" (click)="transcriptModalOpen = false" aria-label="Close transcript">×</button>
+        </header>
+        <div class="modal-body">
+          <blockquote class="modal-quote">{{ activeStory.quote }}</blockquote>
+          <div class="transcript-lines">
+            @for (line of activeStory.transcript; track line.time) {
+              <div class="transcript-row">
+                <span class="t-time">{{ line.time }}</span>
+                <div>
+                  <strong>{{ line.speaker }}</strong>
+                  <p>{{ line.text }}</p>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+        <footer class="modal-footer">
+          <button type="button" class="button button-clay" (click)="toggleAudio()">
+            {{ isPlayingAudio ? 'PAUSE AUDIO' : 'PLAY ORAL HISTORY AUDIO' }}
+          </button>
+          <button type="button" class="button button-outline" (click)="transcriptModalOpen = false">CLOSE</button>
+        </footer>
+      </div>
+    </div>
+  }
+
+  @if (infoModalOpen) {
+    <div class="modal-backdrop" (click)="infoModalOpen = false">
+      <div class="archive-modal" (click)="$event.stopPropagation()">
+        <header class="modal-header">
+          <div>
+            <span class="eyebrow">{{ activeModalSubtitle }}</span>
+            <h2>{{ activeModalTitle }}</h2>
+          </div>
+          <button type="button" class="modal-close" (click)="infoModalOpen = false" aria-label="Close dialog">×</button>
+        </header>
+        <div class="modal-body">
+          @if (activeModalImage) {
+            <img class="modal-banner-img" [src]="activeModalImage" [alt]="activeModalTitle">
+          }
+          <p class="modal-lead-text">{{ activeModalBody }}</p>
+          @if (activeModalHighlights.length) {
+            <ul class="modal-highlights">
+              @for (pt of activeModalHighlights; track pt) {
+                <li>{{ pt }}</li>
+              }
+            </ul>
+          }
+        </div>
+        <footer class="modal-footer">
+          <button type="button" class="button button-green" (click)="infoModalOpen = false; jump('visit')">PLAN YOUR VISIT</button>
+          <button type="button" class="button button-outline" (click)="infoModalOpen = false">CLOSE</button>
+        </footer>
+      </div>
+    </div>
+  }
+
+  @if (visitModalOpen) {
+    <div class="modal-backdrop" (click)="visitModalOpen = false">
+      <div class="archive-modal" (click)="$event.stopPropagation()">
+        <header class="modal-header">
+          <div>
+            <span class="eyebrow">HAI JALABA, SOUTH SUDAN · VISITOR SERVICES</span>
+            <h2>{{ visitBooking.type }}</h2>
+          </div>
+          <button type="button" class="modal-close" (click)="visitModalOpen = false" aria-label="Close booking">×</button>
+        </header>
+        <div class="modal-body">
+          @if (!visitBookingConfirmed) {
+            <form class="visit-booking-form" (ngSubmit)="submitVisitBooking()">
+              <div class="pdf-form-grid">
+                <label>YOUR NAME
+                  <input [(ngModel)]="visitBooking.name" name="vName" placeholder="Full name" required>
+                </label>
+                <label>EMAIL ADDRESS
+                  <input [(ngModel)]="visitBooking.email" name="vEmail" type="email" placeholder="you@example.com" required>
+                </label>
+                <label>PREFERRED DATE
+                  <input [(ngModel)]="visitBooking.date" name="vDate" type="date">
+                </label>
+                <label>GROUP SIZE
+                  <select [(ngModel)]="visitBooking.guests" name="vGuests">
+                    <option value="1">1 Visitor</option>
+                    <option value="2">2 Visitors</option>
+                    <option value="3-10">Small Group (3–10)</option>
+                    <option value="School / Community Group">School or Community Delegation (10+)</option>
+                  </select>
+                </label>
+              </div>
+              <label class="full-field">NOTES OR ACCESSIBILITY NEEDS
+                <textarea [(ngModel)]="visitBooking.notes" name="vNotes" placeholder="Tell us about your visit, school group, or research inquiry..."></textarea>
+              </label>
+              <div class="modal-footer">
+                <button type="submit" class="button button-green">CONFIRM RESERVATION</button>
+                <button type="button" class="button button-outline" (click)="visitModalOpen = false">CANCEL</button>
+              </div>
+            </form>
+          } @else {
+            <div class="booking-confirmed-box">
+              <span class="confirm-mark">✓</span>
+              <h3>We look forward to welcoming you.</h3>
+              <p>Your reservation request for <strong>{{ visitBooking.type }}</strong> has been sent to our visitor team in Hai Jalaba.</p>
+              <button type="button" class="button button-green" (click)="visitModalOpen = false">DONE</button>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (globalSearchOpen) {
+    <div class="modal-backdrop" (click)="globalSearchOpen = false">
+      <div class="archive-modal" (click)="$event.stopPropagation()">
+        <header class="modal-header">
+          <div>
+            <span class="eyebrow">SHE STANDS DIGITAL ARCHIVE</span>
+            <h2>Search the Museum</h2>
+          </div>
+          <button type="button" class="modal-close" (click)="globalSearchOpen = false" aria-label="Close search">×</button>
+        </header>
+        <div class="modal-body">
+          <input
+            class="global-search-input"
+            type="search"
+            [(ngModel)]="globalSearchQuery"
+            placeholder="Search women's names, places (Juba, Bor, Wau), themes, exhibitions or records..."
+            autofocus>
+          <div class="global-results-list">
+            @for (res of globalSearchResults; track res.title) {
+              <button type="button" class="global-result-item" (click)="globalSearchOpen = false; jump(res.section)">
+                <div>
+                  <span class="eyebrow">{{ res.type }}</span>
+                  <h4>{{ res.title }}</h4>
+                  <small>{{ res.subtitle }}</small>
+                </div>
+                <b>→</b>
+              </button>
+            } @empty {
+              @if (globalSearchQuery.trim()) {
+                <p class="empty-state">No archive entries match “{{ globalSearchQuery }}”.</p>
+              } @else {
+                <p class="empty-state">Type a name (e.g. Achol, Nyandeng, Mary), place (Juba, Wau, Bor), or theme (Peacebuilding, Liberation, Culture).</p>
+              }
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Floating Visitor Assistant -->
+  <button class="support-bubble" (click)="openChat()" [attr.aria-expanded]="helpOpen">
+    <span>✳</span> Ask the Archive
+  </button>
+  @if (helpOpen) {
+    <aside class="chat-panel">
+      <header>
+        <div>
+          <span class="online-dot"></span>
+          <strong>Talk with the museum</strong>
+          <small>Messages go to our visitor team in Hai Jalaba.</small>
+        </div>
+        <button (click)="helpOpen = false" aria-label="Close chat">×</button>
+      </header>
+      <div class="chat-intro">
+        <span>SS</span>
+        <p>Welcome. We’re here for questions about visiting, sharing a memory or supporting the archive.</p>
+      </div>
+      @if (chatKey) {
+        <div class="visitor-thread">
+          <div class="thread-refresh">
+            <span>YOUR CONVERSATION</span>
+            <button (click)="refreshChat()">↻ Refresh</button>
+          </div>
+          @for (message of chatMessages; track $index) {
+            <div class="visitor-message" [class.team-message]="message.from === 'team'">
+              <b>{{ message.from === 'team' ? 'Museum team' : 'You' }}</b>
+              <span>{{ message.text }}</span>
+            </div>
+          }
+        </div>
+      }
+      <form (ngSubmit)="sendMessage()">
+        <label>Your name<input [(ngModel)]="messageForm.name" name="chatName" placeholder="Name" required></label>
+        <label>Email<input [(ngModel)]="messageForm.email" name="chatEmail" type="email" placeholder="Email" required></label>
+        <label>Message<textarea [(ngModel)]="messageForm.message" name="chatMessage" placeholder="How can we help?" required></textarea></label>
+        <button class="button button-green">SEND MESSAGE</button>
+        @if (chatStatus) { <small class="form-response">{{ chatStatus }}</small> }
+      </form>
+      <a class="chat-email" href="mailto:info&#64;sswomensmuseum.org">Prefer email? info&#64;sswomensmuseum.org</a>
+    </aside>
+  }
+}
