@@ -54,6 +54,7 @@ export class AppComponent implements OnDestroy {
   activeNav = 'home';
 
   heroImage = 'assets/hero-editorial-v2.png';
+  mobileHeroImage = 'assets/hero-mobile-v2.jpg';
   heroOverride = '';
   heroAudio = '';
   siteImages: Record<string, string> = {};

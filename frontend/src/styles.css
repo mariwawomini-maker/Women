@@ -2734,6 +2734,7 @@ body { background: var(--paper); }
 
 .hero { min-height: clamp(620px, 78vh, 760px); background: var(--green-dark); }
 .hero-photo { object-fit: contain; object-position: right center; }
+.hero-photo-mobile { display: none; }
 .hero-wash { background: linear-gradient(90deg, rgba(7, 34, 22, .97) 0%, rgba(8, 37, 25, .94) 25%, rgba(11, 42, 29, .75) 43%, rgba(11, 42, 29, .16) 69%, rgba(11, 42, 29, .04) 100%), linear-gradient(0deg, rgba(5, 24, 16, .30), transparent 28%); }
 .hero-copy { width: min(760px, 61%); padding: 78px 0 100px clamp(24px, 6vw, 94px); }
 .hero h1 { max-width: 760px; margin: 24px 0 23px; color: #fffaf1; font-family: var(--serif); font-size: clamp(47px, 5.2vw, 78px); font-weight: 500; line-height: .99; letter-spacing: -.052em; text-transform: none; }
@@ -2892,6 +2893,8 @@ ss-root { display: block; max-width: 1680px; margin: 12px auto; overflow: clip; 
 .home-payment-brands .brand-gpay { color: #333; }
 .home-payment-brands .brand-gpay b { color: #4285f4; }
 .home-payment-brands .brand-stripe { background: #635bff; color: white; }
+.home-payment-brands img { display: block; width: 100%; height: auto; object-fit: contain; border-radius: 4px; }
+.brand-logo-img { display: block; width: 100%; max-width: 116px; height: 48px; object-fit: contain; }
 .brand-mark { width: 61px; height: 61px; object-fit: contain; flex: 0 0 auto; }
 .mobile-dock svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
 
@@ -2932,4 +2935,73 @@ ss-root { display: block; max-width: 1680px; margin: 12px auto; overflow: clip; 
   .home-feature-support .button { min-height: 30px; padding: 5px 14px; font-size: 11px; }
   .home-payment-brands { width: 100%; justify-content: center; margin-top: 8px; }
   .home-payment-brands button { min-height: 25px; padding-inline: 6px; font-size: 11px; }
+}
+
+@media (max-width: 480px) {
+  .hero { min-height: 280px; }
+  .hero-copy { padding: 17px 17px 8px; }
+  .hero .pill-badge { font-size: 8px; letter-spacing: .13em; }
+  .hero h1 { margin: 10px 0 8px; font-size: clamp(29px, 7.4vw, 34px); line-height: 1; }
+  .hero-deck { margin-bottom: 9px; font-size: 14px; }
+  .hero .button { min-height: 34px; padding: 7px 12px; }
+  .home-onward { padding: 11px 13px 40px; }
+  .chapter-index { gap: 7px; }
+  .chapter-index a, .chapter-index a:nth-child(3), .chapter-index a:nth-child(-n+3) { min-height: 84px; padding: 8px; border-radius: 12px; }
+  .chapter-index svg { width: 24px; height: 24px; }
+  .chapter-index strong { margin-top: 3px; font-size: 18px; }
+  .home-feature-grid { margin-top: 8px; }
+  .home-feature-support { min-height: 140px; padding: 10px 12px; border-radius: 12px; }
+  .home-feature-support h2 { font-size: 21px; }
+  .home-feature-support p { margin-bottom: 5px; font-size: 11px; line-height: 1.2; }
+  .home-feature-support .button { min-height: 27px; padding: 4px 12px; }
+  .home-payment-brands { gap: 4px; margin-top: 6px; }
+  .home-payment-brands button { min-height: 23px; padding-inline: 5px; font-size: 10px; }
+}
+
+@media (max-width: 780px) {
+  .home-onward { display: flex; flex-direction: column; }
+  .home-feature-grid { display: contents; }
+  .home-feature-story { display: grid; order: 1; grid-template-columns: 47% 53%; min-height: 118px; }
+  .home-feature-story > img { width: 100%; height: 118px; object-fit: contain; }
+  .home-feature-story > div { padding: 12px 14px; }
+  .home-feature-story .eyebrow { display: none; }
+  .home-feature-story h2 { margin: 0 0 5px; font-size: 25px; }
+  .home-feature-story p { margin-bottom: 6px; font-size: 12px; line-height: 1.2; }
+  .home-feature-story a { margin-top: 0; font-size: 10px; }
+  .chapter-index { order: 2; margin-top: 12px; }
+  .home-feature-support { order: 3; margin-top: 12px; }
+  .home-payment-brands { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 5px; width: 100%; }
+  .home-payment-brands button { min-width: 0; min-height: 0; padding: 0; background: transparent; }
+  .home-payment-brands button:hover { transform: translateY(-2px); }
+  .hero-photo { display: none; }
+  .hero-photo-mobile { position: absolute; top: 0; right: 0; display: block; width: auto; height: 100%; object-fit: contain; }
+  .hero-wash { background: linear-gradient(90deg, rgba(6,30,19,.97) 0%, rgba(6,30,19,.76) 43%, rgba(6,30,19,.03) 100%), linear-gradient(0deg, rgba(6,30,19,.55), transparent 52%); }
+}
+
+@media (max-width: 480px) {
+  .hero { min-height: 280px; }
+  .hero h1 { text-transform: uppercase; font-size: clamp(26px, 7.1vw, 31px); font-weight: 600; letter-spacing: -.04em; }
+  .hero h1 em { font-style: normal; }
+  .hero-deck { max-width: 220px; font-style: italic; }
+  .hero .button-cream { display: inline-flex; }
+  .hero .button-row { gap: 6px; }
+  .hero .button { padding-inline: 8px; font-size: 10px; }
+  .home-onward { padding-top: 10px; }
+  .home-feature-story { min-height: 104px; border-radius: 12px; }
+  .home-feature-story > img { height: 104px; }
+  .home-feature-story > div { padding: 8px 10px; }
+  .home-feature-story h2 { font-size: 21px; line-height: .94; }
+  .home-feature-story p { margin-bottom: 4px; font-size: 10px; }
+  .home-feature-story a { font-size: 9px; }
+  .chapter-index { margin-top: 9px; }
+  .chapter-index a, .chapter-index a:nth-child(3), .chapter-index a:nth-child(-n+3) { flex-direction: row; justify-content: space-between; gap: 4px; min-height: 57px; padding: 6px 8px; border-radius: 10px; }
+  .chapter-index svg { flex: 0 0 24px; width: 24px; height: 24px; }
+  .chapter-index strong { margin: 0; font-size: 15px; white-space: nowrap; }
+  .chapter-index b { position: static; display: block; font-size: 0; }
+  .chapter-index b::before { content: '›'; font-size: 23px; line-height: 1; }
+  .home-feature-support { min-height: 106px; margin-top: 9px; padding: 10px; }
+  .home-feature-support h2 { margin-bottom: 2px; font-size: 21px; }
+  .home-feature-support p { max-width: 310px; margin-bottom: 5px; font-size: 10px; font-style: italic; }
+  .home-feature-support > .button { display: none; }
+  .home-payment-brands { gap: 5px; margin-top: 1px; }
 }

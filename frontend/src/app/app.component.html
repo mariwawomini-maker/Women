@@ -224,6 +224,7 @@
     <!-- PAGE 1: HOME / HERO -->
     <section class="hero" id="home">
       <img class="hero-photo" [src]="heroOverride || heroImage" alt="South Sudanese woman in a museum gallery, wearing beadwork and a red textile">
+      <img class="hero-photo-mobile" [src]="heroOverride || mobileHeroImage" alt="South Sudanese woman wearing traditional beadwork in a museum gallery">
       <div class="hero-wash"></div>
 
       <div class="hero-copy">
@@ -252,11 +253,11 @@
         <a href="#exhibitions" (click)="jump('exhibitions'); $event.preventDefault()"><span>03 / THE GALLERIES</span><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M7 11v29m34-29v29M7 16c6 7 12 7 17 0 5 7 11 7 17 0M4 40h6m28 0h6M7 9a2 2 0 1 0 0 .1m34-.1a2 2 0 1 0 0 .1"/></svg><strong>Exhibitions</strong><small>History brought into view</small><b aria-hidden="true">↗</b></a>
         <a href="#learn" (click)="jump('learn'); $event.preventDefault()"><span>04 / THE IDEAS</span><svg viewBox="0 0 48 48" aria-hidden="true"><path d="m4 17 20-9 20 9-20 9L4 17Zm8 5v10c6 6 18 6 24 0V22M44 17v15"/></svg><strong>Learn</strong><small>Resources for every generation</small><b aria-hidden="true">↗</b></a>
         <a href="#visit" (click)="jump('visit'); $event.preventDefault()"><span>05 / THE PLACE</span><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 43s14-14 14-26a14 14 0 0 0-28 0c0 12 14 26 14 26Zm0-20a6 6 0 1 0 0-12 6 6 0 0 0 0 12Z"/></svg><strong>Visit</strong><small>Come closer to her story</small><b aria-hidden="true">↗</b></a>
-        <a href="#involved" (click)="jump('involved'); $event.preventDefault()"><span>06 / THE FUTURE</span><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M16 23a7 7 0 1 0 0-14 7 7 0 0 0 0 14Zm16 0a7 7 0 1 0 0-14 7 7 0 0 0 0 14ZM4 39c0-7 5-12 12-12s12 5 12 12M20 39c0-7 5-12 12-12s12 5 12 12"/></svg><strong>Take part</strong><small>Share a memory or lend a hand</small><b aria-hidden="true">↗</b></a>
+        <a href="#involved" (click)="jump('involved'); $event.preventDefault()"><span>06 / THE FUTURE</span><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M16 23a7 7 0 1 0 0-14 7 7 0 0 0 0 14Zm16 0a7 7 0 1 0 0-14 7 7 0 0 0 0 14ZM4 39c0-7 5-12 12-12s12 5 12 12M20 39c0-7 5-12 12-12s12 5 12 12"/></svg><strong>Get involved</strong><small>Share a memory or lend a hand</small><b aria-hidden="true">↗</b></a>
       </nav>
       <div class="home-feature-grid">
-        <article class="home-feature-story"><img src="assets/pdf-story-1.png" alt="Women whose stories shape the museum archive"><div><span class="eyebrow">CURRENT EXHIBITION</span><h2>Daughters of the Struggle</h2><p>Women’s resolve, leadership and hope in the making of a nation.</p><a href="#exhibitions" (click)="jump('exhibitions'); $event.preventDefault()">Discover the exhibition <span aria-hidden="true">↗</span></a></div></article>
-        <article class="home-feature-support"><span class="eyebrow">STAND WITH HER STORY</span><h2>Support our mission.</h2><p>Your gift helps preserve women’s voices and opens the archive to future generations.</p><button type="button" class="button button-clay" (click)="scrollDonate()">Donate now <span aria-hidden="true">→</span></button><div class="home-payment-brands" role="group" aria-label="Choose a payment option"><button type="button" class="brand-mpesa" (click)="openDonationFor('mpesa')" aria-label="Give with M-Pesa"><span aria-hidden="true">M-PESA</span></button><button type="button" class="brand-paypal" (click)="openDonationFor('paypal')" aria-label="Give with PayPal"><span aria-hidden="true">PayPal</span></button><button type="button" class="brand-gpay" (click)="openDonationFor('google-pay')" aria-label="Give with Google Pay"><span aria-hidden="true"><b>G</b> Pay</span></button><button type="button" class="brand-stripe" (click)="openDonationFor('stripe')" aria-label="Give with Stripe"><span aria-hidden="true">stripe</span></button></div></article>
+        <article class="home-feature-story"><img src="assets/daughters-feature-v2.jpg" alt="Two South Sudanese women standing together"><div><span class="eyebrow">CURRENT EXHIBITION</span><h2>Daughters of the Struggle</h2><p>Stories of resilience, leadership and hope.</p><a href="#exhibitions" (click)="jump('exhibitions'); $event.preventDefault()">Read more <span aria-hidden="true">↗</span></a></div></article>
+        <article class="home-feature-support"><span class="eyebrow">STAND WITH HER STORY</span><h2>♡ Support our mission.</h2><p>Help us preserve and share the stories of extraordinary women.</p><button type="button" class="button button-clay" (click)="scrollDonate()">Donate now <span aria-hidden="true">→</span></button><div class="home-payment-brands" role="group" aria-label="Choose a payment option"><button type="button" (click)="openDonationFor('mpesa')" aria-label="Give with M-Pesa"><img src="assets/payment-mpesa.png" alt="M-PESA"></button><button type="button" (click)="openDonationFor('paypal')" aria-label="Give with PayPal"><img src="assets/payment-paypal.png" alt="PayPal"></button><button type="button" (click)="openDonationFor('google-pay')" aria-label="Give with Google Pay"><img src="assets/payment-google-pay.png" alt="Google Pay"></button><button type="button" (click)="openDonationFor('stripe')" aria-label="Give with Stripe"><img src="assets/payment-stripe.png" alt="Stripe"></button></div></article>
       </div>
     </section>
 
@@ -766,44 +767,25 @@
                 <div class="payment-options-four" role="group" aria-label="Choose payment method">
                   <!-- M-Pesa payment choice -->
                   <button type="button" class="pay-tile" [class.selected]="donation.paymentMethod === 'mpesa'" (click)="choosePayment('mpesa')">
-                    <svg class="brand-logo-svg" viewBox="0 0 140 38" aria-label="M-Pesa">
-                      <rect x="2" y="5" width="24" height="28" rx="4" fill="#168540" />
-                      <rect x="6" y="9" width="16" height="12" rx="1.5" fill="#e8f5e9" />
-                      <path d="M2 19 L28 11 L26 24 Z" fill="#e31837" />
-                      <text x="34" y="25" font-family="Arial, sans-serif" font-weight="900" font-style="italic" font-size="18" fill="#168540" letter-spacing="-0.5">M-PESA</text>
-                    </svg>
+                    <img class="brand-logo-img" src="assets/payment-mpesa.png" alt="M-PESA">
                     <small>Safaricom · KSh</small>
                   </button>
 
                   <!-- Google Pay payment choice -->
                   <button type="button" class="pay-tile" [class.selected]="donation.paymentMethod === 'google-pay'" (click)="choosePayment('google-pay')">
-                    <svg class="brand-logo-svg" viewBox="0 0 130 38" aria-label="Google Pay">
-                      <path d="M31.6 19.3c0-.9-.1-1.8-.2-2.6H19v5h7.1c-.3 1.6-1.2 3-2.6 3.9v3.2h4.2c2.5-2.3 3.9-5.7 3.9-9.5z" fill="#4285F4"/>
-                      <path d="M19 32c3.5 0 6.5-1.2 8.7-3.2l-4.2-3.2c-1.2.8-2.7 1.3-4.5 1.3-3.4 0-6.4-2.3-7.4-5.5H7.2v3.3C9.4 29.1 13.9 32 19 32z" fill="#34A853"/>
-                      <path d="M11.6 21.4c-.3-.8-.4-1.7-.4-2.6s.2-1.8.4-2.6v-3.3H7.2C6.3 14.7 5.8 16.8 5.8 18.8s.5 4.1 1.4 5.9l4.4-3.3z" fill="#FBBC05"/>
-                      <path d="M19 10.7c1.9 0 3.6.7 5 1.9l3.7-3.7C25.5 6.8 22.5 5.6 19 5.6c-5.1 0-9.6 2.9-11.8 7.3l4.4 3.3c1-3.2 4-5.5 7.4-5.5z" fill="#EA4335"/>
-                      <text x="40" y="25.5" font-family="'DM Sans', Arial, sans-serif" font-weight="700" font-size="19" fill="#3c4043">Pay</text>
-                    </svg>
+                    <img class="brand-logo-img" src="assets/payment-google-pay.png" alt="Google Pay">
                     <small>Google Wallet · USD</small>
                   </button>
 
                   <!-- PayPal payment choice -->
                   <button type="button" class="pay-tile" [class.selected]="donation.paymentMethod === 'paypal'" (click)="choosePayment('paypal')">
-                    <svg class="brand-logo-svg" viewBox="0 0 135 38" aria-label="PayPal">
-                      <path d="M16.5 7h8.2c4.5 0 6.8 2.2 6.2 6.2-.7 4.7-3.8 7.3-8.3 7.3H19l-1.3 8.5h-4.6L16.5 7z" fill="#003087"/>
-                      <path d="M20.2 11.2h6.8c3.6 0 5.5 1.8 5 5.2-.6 3.9-3.1 6.1-6.8 6.1h-3l-1.1 7.5h-3.8l2.9-18.8z" fill="#0079C1" opacity="0.9"/>
-                      <text x="36" y="25" font-family="Arial, sans-serif" font-weight="800" font-style="italic" font-size="18.5" fill="#003087">Pay</text>
-                      <text x="69" y="25" font-family="Arial, sans-serif" font-weight="800" font-style="italic" font-size="18.5" fill="#0079C1">Pal</text>
-                    </svg>
+                    <img class="brand-logo-img" src="assets/payment-paypal.png" alt="PayPal">
                     <small>PayPal Checkout</small>
                   </button>
 
                   <!-- Stripe payment choice -->
                   <button type="button" class="pay-tile" [class.selected]="donation.paymentMethod === 'stripe'" (click)="choosePayment('stripe')">
-                    <svg class="brand-logo-svg" viewBox="0 0 130 38" aria-label="Stripe">
-                      <rect x="6" y="6" width="118" height="26" rx="5" fill="#635BFF"/>
-                      <text x="65" y="24.5" text-anchor="middle" font-family="'DM Sans', Arial, sans-serif" font-weight="800" font-size="18" fill="#ffffff" letter-spacing="-0.4">stripe</text>
-                    </svg>
+                    <img class="brand-logo-img" src="assets/payment-stripe.png" alt="Stripe">
                     <small>Card & Global · USD</small>
                   </button>
                 </div>
@@ -950,7 +932,7 @@
   <nav class="mobile-dock" aria-label="Quick navigation">
     <a href="#home" [class.active]="activeNav === 'home'" (click)="jump('home'); $event.preventDefault()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 11 9-8 9 8v9H3v-9Zm6 9v-7h6v7"/></svg>Home</a>
     <a href="#stories" [class.active]="activeNav === 'stories'" (click)="jump('stories'); $event.preventDefault()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6C9 4 5 4 2 5v14c4-1 7 0 10 2 3-2 6-3 10-2V5c-3-1-7-1-10 1Zm0 0v15"/></svg>Stories</a>
-    <a href="#collections" [class.active]="activeNav === 'collections'" (click)="jump('collections'); $event.preventDefault()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m2 10 10-7 10 7M4 10h16M5 19V10m5 9v-9m4 9v-9m5 9v-9M3 20h18M2 22h20"/></svg>Archive</a>
+    <a href="#exhibitions" [class.active]="activeNav === 'exhibitions'" (click)="jump('exhibitions'); $event.preventDefault()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m2 10 10-7 10 7M4 10h16M5 19V10m5 9v-9m4 9v-9m5 9v-9M3 20h18M2 22h20"/></svg>Museum</a>
     <a href="#support" [class.active]="activeNav === 'support'" (click)="jump('support'); $event.preventDefault()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21S2 14 2 8a5 5 0 0 1 10-1 5 5 0 0 1 10 1c0 6-10 13-10 13Z"/></svg>Support</a>
     <a href="#visit" [class.active]="activeNav === 'visit'" (click)="jump('visit'); $event.preventDefault()"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="1"/><path d="M7 3v4m10-4v4M3 10h18m-14 4h3m4 0h3m-10 4h3"/></svg>Visit</a>
   </nav>
