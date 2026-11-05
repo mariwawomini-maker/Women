@@ -1,0 +1,8 @@
+{
+  "name": "she-stands-museum-deploy",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build:pages": "node scripts/build-pages-root.mjs"
+  }
+}

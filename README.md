@@ -26,13 +26,13 @@ Connect this GitHub repository to a Pages project and set:
 
 | Setting | Value |
 | --- | --- |
-| Root directory | `frontend` |
+| Root directory | Leave blank (repository root) |
 | Build command | `npm run build:pages` |
 | Build output directory | `dist/she-stands/browser` |
 | Environment variable | `PUBLIC_API_BASE_URL=https://YOUR-RENDER-SERVICE.onrender.com` |
 | Node version | `24` |
 
-`build:pages` writes the Render API URL into the published assets after Angular builds. The site and `/admin` then use that API URL. For Cloudflare preview domains or a custom domain, add the intended production origin to Render's `FRONTEND_URL` setting before using donation redirects and admin requests.
+The root build installs the `frontend` dependencies, runs its Angular build, and copies the output to `dist/she-stands/browser`. `build:pages` writes the Render API URL into the published assets. The site and `/admin` then use that API URL. If you set the Cloudflare root directory to `frontend` instead, keep the same build command and output directory; the frontend also has its own build script. For Cloudflare preview domains or a custom domain, set the intended production origin in Render's `FRONTEND_URL` before using donation redirects and admin requests.
 
 ## Payment configuration
 
