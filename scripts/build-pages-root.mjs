@@ -7,13 +7,15 @@ const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const frontendDir = path.join(rootDir, 'frontend');
 const npmCli = process.env.npm_execpath;
 if (!npmCli) throw new Error('Run this build through npm: npm run build:pages');
-if (!process.env.PUBLIC_API_BASE_URL?.trim()) {
-  throw new Error('Set PUBLIC_API_BASE_URL to your Render HTTPS URL in Cloudflare Pages.');
-}
+const rawApiUrl = process.env.PUBLIC_API_BASE_URL?.trim() || 'https://she-stands-museum.onrender.com';
+process.env.PUBLIC_API_BASE_URL = rawApiUrl;
 
-for (const args of [['ci'], ['run', 'build:pages']]) {
-  execFileSync(process.execPath, [npmCli, ...args], { cwd: frontendDir, stdio: 'inherit' });
+import { existsSync } from 'node:fs';
+
+if (!existsSync(path.join(frontendDir, 'node_modules'))) {
+  execFileSync(process.execPath, [npmCli, 'ci'], { cwd: frontendDir, stdio: 'inherit', env: { ...process.env, PUBLIC_API_BASE_URL: rawApiUrl } });
 }
+execFileSync(process.execPath, [npmCli, 'run', 'build:pages'], { cwd: frontendDir, stdio: 'inherit', env: { ...process.env, PUBLIC_API_BASE_URL: rawApiUrl } });
 
 const publishDir = path.join(rootDir, 'dist', 'she-stands', 'browser');
 await mkdir(publishDir, { recursive: true });

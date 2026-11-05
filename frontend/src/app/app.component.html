@@ -193,20 +193,27 @@
   </div>
 } @else {
   <!-- TOP NAVIGATION BAR (Matches PDF Header on every page) -->
+  <!-- TOP NAVIGATION BAR (Matches PDF / Redesign Header) -->
   <header class="site-header">
     <a class="brand" href="#home" (click)="jump('home'); $event.preventDefault()" aria-label="She Stands Women's Museum home">
       <img class="brand-mark" src="assets/museum-mark-v2-small.png" alt="" aria-hidden="true">
+      <span class="brand-divider" aria-hidden="true"></span>
       <span class="brand-wordmark"><strong>SHE STANDS</strong><small>WOMEN'S MUSEUM</small></span>
     </a>
 
     <button class="menu-toggle" (click)="navOpen = !navOpen" [attr.aria-expanded]="navOpen" aria-label="Toggle navigation">
-      <span></span><span></span>
+      <span></span><span></span><span></span>
     </button>
 
     <nav [class.open]="navOpen" aria-label="Main navigation">
-      @for (item of navItems; track item[1]) {
-        <a [href]="'#' + item[1]" [class.active]="activeNav === item[1]" (click)="jump(item[1]); $event.preventDefault()">{{ item[0] }}</a>
-      }
+      <a href="#home" class="nav-home-pill" [class.active]="activeNav === 'home'" (click)="jump('home'); $event.preventDefault()">Home</a>
+      <a href="#about" [class.active]="activeNav === 'about'" (click)="jump('about'); $event.preventDefault()">About <span class="nav-caret" aria-hidden="true">⌵</span></a>
+      <a href="#stories" [class.active]="activeNav === 'stories'" (click)="jump('stories'); $event.preventDefault()">Stories <span class="nav-caret" aria-hidden="true">⌵</span></a>
+      <a href="#collections" [class.active]="activeNav === 'collections'" (click)="jump('collections'); $event.preventDefault()">Collections <span class="nav-caret" aria-hidden="true">⌵</span></a>
+      <a href="#exhibitions" [class.active]="activeNav === 'exhibitions'" (click)="jump('exhibitions'); $event.preventDefault()">Exhibitions <span class="nav-caret" aria-hidden="true">⌵</span></a>
+      <a href="#learn" [class.active]="activeNav === 'learn'" (click)="jump('learn'); $event.preventDefault()">Learn <span class="nav-caret" aria-hidden="true">⌵</span></a>
+      <a href="#visit" [class.active]="activeNav === 'visit'" (click)="jump('visit'); $event.preventDefault()">Visit <span class="nav-caret" aria-hidden="true">⌵</span></a>
+      <a href="#involved" [class.active]="activeNav === 'involved'" (click)="jump('involved'); $event.preventDefault()">Get Involved <span class="nav-caret" aria-hidden="true">⌵</span></a>
     </nav>
 
     <div class="header-actions">
@@ -216,48 +223,161 @@
           <line x1="15.5" y1="15.5" x2="21" y2="21"></line>
         </svg>
       </button>
-      <button class="header-donate" type="button" (click)="scrollDonate()">Give to the museum <span aria-hidden="true">↗</span></button>
+      <button class="header-donate-pill" type="button" (click)="scrollDonate()">Donate 🤍</button>
     </div>
   </header>
 
   <main>
     <!-- PAGE 1: HOME / HERO -->
     <section class="hero" id="home">
-      <img class="hero-photo" [src]="heroOverride || heroImage" alt="South Sudanese woman in a museum gallery, wearing beadwork and a red textile">
+      <img class="hero-photo" [src]="heroOverride || heroImage" alt="South Sudanese woman wearing traditional beadwork in a museum gallery">
       <img class="hero-photo-mobile" [src]="heroOverride || mobileHeroImage" alt="South Sudanese woman wearing traditional beadwork in a museum gallery">
       <div class="hero-wash"></div>
+      <div class="hero-swoosh-ribbon" aria-hidden="true"></div>
 
       <div class="hero-copy">
-        <span class="pill-badge">HONOUR <i></i> INSPIRE <i></i> EMPOWER</span>
-        <h1>A living tribute<br>to the women who built<br><em>South Sudan.</em></h1>
+        <span class="pill-badge">HONOUR · INSPIRE · EMPOWER</span>
+        <h1>A Living Tribute<br>to the Women Who Built<br><span class="hero-gold-text">South Sudan</span></h1>
         <p class="hero-deck">Their courage. Their stories. Our heritage.</p>
         <div class="button-row">
-          <a class="button button-clay" href="#stories" (click)="jump('stories'); $event.preventDefault()">Explore stories <span aria-hidden="true">→</span></a>
-          <a class="button button-cream" href="#visit" (click)="jump('visit'); $event.preventDefault()">Plan your visit <span aria-hidden="true">↗</span></a>
+          <a class="button button-clay-pill" href="#stories" (click)="jump('stories'); $event.preventDefault()">Explore Stories <span aria-hidden="true">→</span></a>
+          <a class="button button-visit-pill" href="#visit" (click)="jump('visit'); $event.preventDefault()">Plan Your Visit <span class="visit-pill-icon" aria-hidden="true">📅</span></a>
+        </div>
+        <div class="hero-carousel-dots" aria-hidden="true">
+          <span></span><span class="active"></span><span></span><span></span>
         </div>
       </div>
-
-      <aside class="now-card">
-        <span class="eyebrow">NOW SHOWING</span>
-        <h2>Daughters of the Struggle</h2>
-        <p>Women of liberation, resistance and nation-building.</p>
-        <a href="#exhibitions" (click)="jump('exhibitions'); $event.preventDefault()">VIEW EXHIBITION <span>→</span></a>
-      </aside>
     </section>
 
     <section class="home-onward" aria-label="Explore She Stands">
-      <div class="home-onward-heading"><span class="eyebrow">A MUSEUM IN MANY VOICES</span><p>Find your way in.</p></div>
-      <nav class="chapter-index" aria-label="Museum sections">
-        <a href="#stories" (click)="jump('stories'); $event.preventDefault()"><span>01 / THE PEOPLE</span><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 12c-6-4-13-4-19-2v25c7-2 13-1 19 3 6-4 12-5 19-3V10c-6-2-13-2-19 2Zm0 0v26"/></svg><strong>Stories</strong><small>Meet the women behind the history</small><b aria-hidden="true">↗</b></a>
-        <a href="#collections" (click)="jump('collections'); $event.preventDefault()"><span>02 / THE ARCHIVE</span><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M17 6h14M19 6v7c0 4-7 7-7 15 0 8 5 14 12 14s12-6 12-14c0-8-7-11-7-15V6M15 22h18M17 36h14"/></svg><strong>Collections</strong><small>Objects, images and voices</small><b aria-hidden="true">↗</b></a>
-        <a href="#exhibitions" (click)="jump('exhibitions'); $event.preventDefault()"><span>03 / THE GALLERIES</span><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M7 11v29m34-29v29M7 16c6 7 12 7 17 0 5 7 11 7 17 0M4 40h6m28 0h6M7 9a2 2 0 1 0 0 .1m34-.1a2 2 0 1 0 0 .1"/></svg><strong>Exhibitions</strong><small>History brought into view</small><b aria-hidden="true">↗</b></a>
-        <a href="#learn" (click)="jump('learn'); $event.preventDefault()"><span>04 / THE IDEAS</span><svg viewBox="0 0 48 48" aria-hidden="true"><path d="m4 17 20-9 20 9-20 9L4 17Zm8 5v10c6 6 18 6 24 0V22M44 17v15"/></svg><strong>Learn</strong><small>Resources for every generation</small><b aria-hidden="true">↗</b></a>
-        <a href="#visit" (click)="jump('visit'); $event.preventDefault()"><span>05 / THE PLACE</span><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 43s14-14 14-26a14 14 0 0 0-28 0c0 12 14 26 14 26Zm0-20a6 6 0 1 0 0-12 6 6 0 0 0 0 12Z"/></svg><strong>Visit</strong><small>Come closer to her story</small><b aria-hidden="true">↗</b></a>
-        <a href="#involved" (click)="jump('involved'); $event.preventDefault()"><span>06 / THE FUTURE</span><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M16 23a7 7 0 1 0 0-14 7 7 0 0 0 0 14Zm16 0a7 7 0 1 0 0-14 7 7 0 0 0 0 14ZM4 39c0-7 5-12 12-12s12 5 12 12M20 39c0-7 5-12 12-12s12 5 12 12"/></svg><strong>Get involved</strong><small>Share a memory or lend a hand</small><b aria-hidden="true">↗</b></a>
+      <!-- MOBILE ONLY: Exhibition Banner Card directly below hero -->
+      <article class="mobile-exhibition-banner" (click)="jump('exhibitions')">
+        <img class="mobile-exhibition-thumb" src="assets/daughters-feature-v2.jpg" alt="Daughters of the Struggle">
+        <div class="mobile-exhibition-copy">
+          <h3>Daughters of the Struggle</h3>
+          <p>Stories of resilience, leadership and hope.</p>
+        </div>
+        <div class="mobile-circle-arrow" aria-hidden="true">→</div>
+      </article>
+
+      <!-- DESKTOP: 5 Main Category Cards -->
+      <nav class="desktop-category-cards" aria-label="Museum sections">
+        <a href="#stories" (click)="jump('stories'); $event.preventDefault()" class="cat-card">
+          <div class="cat-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 4.5C10.5 3.2 8.5 2.5 6.5 2.5A6.5 6.5 0 0 0 0 9v11.5c0 .3.2.5.5.5.1 0 .2 0 .3-.1C2.3 19.8 4.4 19 6.5 19c2 0 4 .8 5.5 2.1 1.5-1.3 3.5-2.1 5.5-2.1 2.1 0 4.2.8 5.7 1.9.1.1.2.1.3.1.3 0 .5-.2.5-.5V9a6.5 6.5 0 0 0-6.5-6.5c-2 0-4 .7-5.5 2Zm-1 13.5c-1.3-1-3-1.5-4.5-1.5-1.8 0-3.5.7-4.5 1.5V9.5C2 8.7 3.7 8 5.5 8c1.5 0 3.2.5 4.5 1.5V18Zm11 0c-1-.8-2.7-1.5-4.5-1.5-1.5 0-3.2.5-4.5 1.5V9.5C14.3 8.5 16 8 17.5 8c1.8 0 3.5.7 4.5 1.5V18Z"/></svg>
+          </div>
+          <strong>Stories</strong>
+          <small>Discover inspiring women's journeys</small>
+          <span class="cat-circle-arrow" aria-hidden="true">→</span>
+        </a>
+        <a href="#collections" (click)="jump('collections'); $event.preventDefault()" class="cat-card">
+          <div class="cat-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M9 2h6v2h-1v2.2c2.8 1.4 4.5 4.2 4.5 7.8 0 4.4-2.8 7-6.5 7s-6.5-2.6-6.5-7c0-3.6 1.7-6.4 4.5-7.8V4H9V2Zm1 4.5C8 7.6 6.8 9.7 6.8 14c0 3.1 1.8 5.2 4.7 5.2s4.7-2.1 4.7-5.2c0-4.3-1.2-6.4-3.2-7.5V4h-3v2.5Z"/></svg>
+          </div>
+          <strong>Collections</strong>
+          <small>Explore our rich heritage</small>
+          <span class="cat-circle-arrow" aria-hidden="true">→</span>
+        </a>
+        <a href="#exhibitions" (click)="jump('exhibitions'); $event.preventDefault()" class="cat-card">
+          <div class="cat-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 5h2v4.5c1.8-.9 4.2-1.5 7-1.5s5.2.6 7 1.5V5h2v14h-2v-4.5c-1.8.9-4.2 1.5-7 1.5s-5.2-.6-7-1.5V19H3V5Zm4 5.2V13c1.6.6 3.4 1 5 1s3.4-.4 5-1v-2.8c-1.6-.7-3.4-1.2-5-1.2s-3.4.5-5 1.2Z"/></svg>
+          </div>
+          <strong>Exhibitions</strong>
+          <small>Experience our dynamic exhibits</small>
+          <span class="cat-circle-arrow" aria-hidden="true">→</span>
+        </a>
+        <a href="#learn" (click)="jump('learn'); $event.preventDefault()" class="cat-card">
+          <div class="cat-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3 1 9l11 6 9-4.91V17h2V9L12 3Zm0 13.5c-3.1 0-6.1-1.3-7.5-3.1V17c0 2.8 3.4 5 7.5 5s7.5-2.2 7.5-5v-3.6c-1.4 1.8-4.4 3.1-7.5 3.1Z"/></svg>
+          </div>
+          <strong>Learn</strong>
+          <small>Educate. Empower.</small>
+          <span class="cat-circle-arrow" aria-hidden="true">→</span>
+        </a>
+        <a href="#visit" (click)="jump('visit'); $event.preventDefault()" class="cat-card">
+          <div class="cat-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7Zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5Z"/></svg>
+          </div>
+          <strong>Visit</strong>
+          <small>Plan your visit today</small>
+          <span class="cat-circle-arrow" aria-hidden="true">→</span>
+        </a>
       </nav>
+
+      <!-- MOBILE ONLY: 2-Column 6-Card Navigation Grid -->
+      <nav class="mobile-nav-grid" aria-label="Explore museum sections">
+        <a href="#stories" (click)="jump('stories'); $event.preventDefault()" class="mobile-nav-tile">
+          <div class="mobile-tile-icon"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 4.5C10.5 3.2 8.5 2.5 6.5 2.5A6.5 6.5 0 0 0 0 9v11.5c0 .3.2.5.5.5.1 0 .2 0 .3-.1C2.3 19.8 4.4 19 6.5 19c2 0 4 .8 5.5 2.1 1.5-1.3 3.5-2.1 5.5-2.1 2.1 0 4.2.8 5.7 1.9.1.1.2.1.3.1.3 0 .5-.2.5-.5V9a6.5 6.5 0 0 0-6.5-6.5c-2 0-4 .7-5.5 2Z"/></svg></div>
+          <strong>Stories</strong>
+          <span class="tile-chevron" aria-hidden="true">›</span>
+        </a>
+        <a href="#collections" (click)="jump('collections'); $event.preventDefault()" class="mobile-nav-tile">
+          <div class="mobile-tile-icon"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M9 2h6v2h-1v2.2c2.8 1.4 4.5 4.2 4.5 7.8 0 4.4-2.8 7-6.5 7s-6.5-2.6-6.5-7c0-3.6 1.7-6.4 4.5-7.8V4H9V2Z"/></svg></div>
+          <strong>Collections</strong>
+          <span class="tile-chevron" aria-hidden="true">›</span>
+        </a>
+        <a href="#exhibitions" (click)="jump('exhibitions'); $event.preventDefault()" class="mobile-nav-tile">
+          <div class="mobile-tile-icon"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 5h2v4.5c1.8-.9 4.2-1.5 7-1.5s5.2.6 7 1.5V5h2v14h-2v-4.5c-1.8.9-4.2 1.5-7 1.5s-5.2-.6-7-1.5V19H3V5Z"/></svg></div>
+          <strong>Exhibitions</strong>
+          <span class="tile-chevron" aria-hidden="true">›</span>
+        </a>
+        <a href="#learn" (click)="jump('learn'); $event.preventDefault()" class="mobile-nav-tile">
+          <div class="mobile-tile-icon"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3 1 9l11 6 9-4.91V17h2V9L12 3Z"/></svg></div>
+          <strong>Learn</strong>
+          <span class="tile-chevron" aria-hidden="true">›</span>
+        </a>
+        <a href="#visit" (click)="jump('visit'); $event.preventDefault()" class="mobile-nav-tile">
+          <div class="mobile-tile-icon"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7Zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5Z"/></svg></div>
+          <strong>Visit</strong>
+          <span class="tile-chevron" aria-hidden="true">›</span>
+        </a>
+        <a href="#involved" (click)="jump('involved'); $event.preventDefault()" class="mobile-nav-tile">
+          <div class="mobile-tile-icon"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3Zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3Zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5Z"/></svg></div>
+          <strong>Get Involved</strong>
+          <span class="tile-chevron" aria-hidden="true">›</span>
+        </a>
+      </nav>
+
+      <!-- FEATURE ROW (Desktop: 2 Columns: Exhibition + Support; Mobile: Support Card) -->
       <div class="home-feature-grid">
-        <article class="home-feature-story"><img src="assets/daughters-feature-v2.jpg" alt="Two South Sudanese women standing together"><div><span class="eyebrow">CURRENT EXHIBITION</span><h2>Daughters of the Struggle</h2><p>Stories of resilience, leadership and hope.</p><a href="#exhibitions" (click)="jump('exhibitions'); $event.preventDefault()">Read more <span aria-hidden="true">↗</span></a></div></article>
-        <article class="home-feature-support"><span class="eyebrow">STAND WITH HER STORY</span><h2>♡ Support our mission.</h2><p>Help us preserve and share the stories of extraordinary women.</p><button type="button" class="button button-clay" (click)="scrollDonate()">Donate now <span aria-hidden="true">→</span></button><div class="home-payment-brands" role="group" aria-label="Choose a payment option"><button type="button" (click)="openDonationFor('mpesa')" aria-label="Give with M-Pesa"><img src="assets/payment-mpesa.png" alt="M-PESA"></button><button type="button" (click)="openDonationFor('paypal')" aria-label="Give with PayPal"><img src="assets/payment-paypal.png" alt="PayPal"></button><button type="button" (click)="openDonationFor('google-pay')" aria-label="Give with Google Pay"><img src="assets/payment-google-pay.png" alt="Google Pay"></button><button type="button" (click)="openDonationFor('stripe')" aria-label="Give with Stripe"><img src="assets/payment-stripe.png" alt="Stripe"></button></div></article>
+        <article class="home-feature-story desktop-exhibition-card">
+          <div class="feature-story-img-wrap">
+            <img src="assets/daughters-feature-v2.jpg" alt="Daughters of the Struggle exhibition">
+          </div>
+          <div class="feature-story-content">
+            <span class="eyebrow">CURRENT EXHIBITION</span>
+            <h2>Daughters of the Struggle</h2>
+            <p>Stories of resilience, leadership and hope.</p>
+            <a href="#exhibitions" class="button button-green-pill" (click)="jump('exhibitions'); $event.preventDefault()">Read More <span aria-hidden="true">→</span></a>
+          </div>
+        </article>
+
+        <article class="home-feature-support">
+          <div class="support-card-content">
+            <div class="support-heading-row">
+              <span class="support-heart" aria-hidden="true">🤍</span>
+              <h2>Support Our Mission</h2>
+            </div>
+            <p>Help us preserve and share the stories of extraordinary women.</p>
+            <div class="support-actions-row">
+              <button type="button" class="button button-clay-pill" (click)="scrollDonate()">Donate Now <span aria-hidden="true">→</span></button>
+              <div class="home-payment-brands" role="group" aria-label="Official payment options">
+                <button type="button" class="payment-badge-pill" (click)="openDonationFor('mpesa')" aria-label="Give with M-Pesa">
+                  <img src="assets/payment-mpesa.png" alt="M-PESA">
+                </button>
+                <button type="button" class="payment-badge-pill" (click)="openDonationFor('paypal')" aria-label="Give with PayPal">
+                  <img src="assets/payment-paypal.png" alt="PayPal">
+                </button>
+                <button type="button" class="payment-badge-pill" (click)="openDonationFor('google-pay')" aria-label="Give with Google Pay">
+                  <img src="assets/payment-google-pay.png" alt="Google Pay">
+                </button>
+                <button type="button" class="payment-badge-pill" (click)="openDonationFor('stripe')" aria-label="Give with Stripe">
+                  <img src="assets/payment-stripe.png" alt="Stripe">
+                </button>
+              </div>
+            </div>
+          </div>
+        </article>
       </div>
     </section>
 
@@ -917,24 +1037,73 @@
     </section>
   </main>
 
-  <!-- FOOTER BAR (Matches PDF Footer on every page) -->
+  <!-- FOOTER BAR (Matches Redesign Mockup) -->
   <footer class="pdf-footer">
-    <div class="pdf-footer-left">
-      <strong>SHE STANDS WOMEN'S MUSEUM</strong>
-      <span>Hai Jalaba, South Sudan &nbsp;|&nbsp; <a href="mailto:info&#64;sswomensmuseum.org">info&#64;sswomensmuseum.org</a> &nbsp;|&nbsp; 098 6600167 / 092 6600167</span>
+    <div class="footer-top-row">
+      <div class="footer-brand-wrap">
+        <img class="footer-logo" src="assets/museum-mark-v2-small.png" alt="She Stands Logo">
+        <div class="footer-brand-text">
+          <strong>SHE STANDS</strong>
+          <small>WOMEN'S MUSEUM</small>
+        </div>
+        <span class="footer-motto">Her story. Our heritage.</span>
+      </div>
+
+      <div class="footer-social-links">
+        <a href="https://facebook.com" target="_blank" rel="noreferrer" aria-label="Facebook">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+        </a>
+        <a href="https://twitter.com" target="_blank" rel="noreferrer" aria-label="X (formerly Twitter)">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        </a>
+        <a href="https://instagram.com" target="_blank" rel="noreferrer" aria-label="Instagram">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+        </a>
+        <a href="https://youtube.com" target="_blank" rel="noreferrer" aria-label="YouTube">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+        </a>
+      </div>
+
+      <div class="footer-legal-links">
+        <a href="#about" (click)="jump('about'); $event.preventDefault()">Privacy Policy</a>
+        <span aria-hidden="true">|</span>
+        <a href="#about" (click)="jump('about'); $event.preventDefault()">Terms of Service</a>
+        <span aria-hidden="true">|</span>
+        <a href="#involved" (click)="jump('involved'); $event.preventDefault()">Contact Us</a>
+      </div>
+
+      <div class="footer-newsletter-wrap">
+        <label for="footer-email-input">Subscribe to our newsletter</label>
+        <form class="footer-newsletter-form" (ngSubmit)="subscribe()">
+          <input id="footer-email-input" [(ngModel)]="newsletterEmail" name="newsletterEmail" type="email" placeholder="Your email address" required>
+          <button type="submit" aria-label="Subscribe">→</button>
+        </form>
+      </div>
     </div>
-    <div class="pdf-footer-right">
-      <span>Supported and financed by The Achol Philip Foundation</span>
-      <a href="#visit" (click)="jump('visit'); $event.preventDefault()">Plan a visit ↗</a>
-    </div>
+    <div class="footer-pattern-band" aria-hidden="true"></div>
   </footer>
 
   <nav class="mobile-dock" aria-label="Quick navigation">
-    <a href="#home" [class.active]="activeNav === 'home'" (click)="jump('home'); $event.preventDefault()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 11 9-8 9 8v9H3v-9Zm6 9v-7h6v7"/></svg>Home</a>
-    <a href="#stories" [class.active]="activeNav === 'stories'" (click)="jump('stories'); $event.preventDefault()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6C9 4 5 4 2 5v14c4-1 7 0 10 2 3-2 6-3 10-2V5c-3-1-7-1-10 1Zm0 0v15"/></svg>Stories</a>
-    <a href="#exhibitions" [class.active]="activeNav === 'exhibitions'" (click)="jump('exhibitions'); $event.preventDefault()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m2 10 10-7 10 7M4 10h16M5 19V10m5 9v-9m4 9v-9m5 9v-9M3 20h18M2 22h20"/></svg>Museum</a>
-    <a href="#support" [class.active]="activeNav === 'support'" (click)="jump('support'); $event.preventDefault()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21S2 14 2 8a5 5 0 0 1 10-1 5 5 0 0 1 10 1c0 6-10 13-10 13Z"/></svg>Support</a>
-    <a href="#visit" [class.active]="activeNav === 'visit'" (click)="jump('visit'); $event.preventDefault()"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="1"/><path d="M7 3v4m10-4v4M3 10h18m-14 4h3m4 0h3m-10 4h3"/></svg>Visit</a>
+    <a href="#home" [class.active]="activeNav === 'home'" (click)="jump('home'); $event.preventDefault()">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 11 9-8 9 8v9H3v-9Zm6 9v-7h6v7"/></svg>
+      <span>Home</span>
+    </a>
+    <a href="#stories" [class.active]="activeNav === 'stories'" (click)="jump('stories'); $event.preventDefault()">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6C9 4 5 4 2 5v14c4-1 7 0 10 2 3-2 6-3 10-2V5c-3-1-7-1-10 1Zm0 0v15"/></svg>
+      <span>Stories</span>
+    </a>
+    <a href="#exhibitions" [class.active]="activeNav === 'exhibitions'" (click)="jump('exhibitions'); $event.preventDefault()">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m2 10 10-7 10 7M4 10h16M5 19V10m5 9v-9m4 9v-9m5 9v-9M3 20h18M2 22h20"/></svg>
+      <span>Museum</span>
+    </a>
+    <a href="#support" [class.active]="activeNav === 'support'" (click)="jump('support'); $event.preventDefault()">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21S2 14 2 8a5 5 0 0 1 10-1 5 5 0 0 1 10 1c0 6-10 13-10 13Z"/></svg>
+      <span>Support</span>
+    </a>
+    <a href="#visit" [class.active]="activeNav === 'visit'" (click)="jump('visit'); $event.preventDefault()">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="1"/><path d="M7 3v4m10-4v4M3 10h18m-14 4h3m4 0h3m-10 4h3"/></svg>
+      <span>Visit</span>
+    </a>
   </nav>
 
   <!-- INTERACTIVE MODALS (Transcript, Exhibition/Resource/News Reader, Visit Booking, Global Search) -->
