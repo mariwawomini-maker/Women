@@ -339,6 +339,7 @@ export class AppComponent implements OnDestroy {
   // Donation & Checkout Studio
   showDonationStudio = true;
   donation = { name: '', email: '', amount: 50, frequency: 'once', note: '', paymentMethod: 'mpesa', phone: '' };
+  manualReferenceNeeded = false;
   donationState: 'form' | 'pending' | 'done' = 'form';
   donationMessage = '';
   donationReference = '';
@@ -743,6 +744,7 @@ export class AppComponent implements OnDestroy {
         }
         this.donationReference = result.reference || result.id;
         this.donationMessage = result.message;
+        this.manualReferenceNeeded = result.pending === false;
         this.donationState = 'pending';
       },
       error: (error) =>
@@ -755,7 +757,7 @@ export class AppComponent implements OnDestroy {
     this.http.post<any>(`${this.api}/donations/${this.donationId}/reference`, { reference: this.donation.note }).subscribe({
       next: () => {
         this.donationState = 'done';
-        this.donationMessage = 'Thank you. Your payment reference has been recorded in the museum support ledger for curator verification.';
+        this.donationMessage = 'Thank you. The museum team will review your receipt and confirm your gift.';
       },
       error: (error) => (this.donationMessage = error.error?.message || 'We could not send that reference. Please try again.')
     });
@@ -875,10 +877,10 @@ export class AppComponent implements OnDestroy {
     data.append('file', file);
     this.http.post<any>(`${this.api}/admin/media`, data, this.httpOptions()).subscribe({
       next: () => {
-        this.adminNotice = 'File uploaded to Cloudinary.';
+        this.adminNotice = 'File uploaded to the media library.';
         this.loadAdmin();
       },
-      error: (error) => (this.adminNotice = error.error?.message || 'Upload failed. Check Cloudinary configuration.')
+      error: (error) => (this.adminNotice = error.error?.message || 'The file could not be uploaded.')
     });
   }
 

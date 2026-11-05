@@ -152,7 +152,7 @@ async function syncGeneratedSiteImages() {
 
 async function putInCloudinary(file) {
   if (!cloudinaryReady()) {
-    const error = new Error('Cloudinary is not configured. Add your Cloudinary credentials to backend/.env.');
+    const error = new Error('File uploads are temporarily unavailable. Please try again later.');
     error.status = 503;
     throw error;
   }
@@ -227,7 +227,7 @@ app.post('/api/donations', publicLimiter, asyncRoute(async (req, res) => {
         id: donation._id,
         reference: referenceCode,
         pending: false,
-        message: `Your M-Pesa pledge of KSh ${amount.toLocaleString()} is recorded under reference ${referenceCode}. Enter your M-Pesa receipt code below so our curator team can verify it in the ledger.`
+        message: `Your wish to give KSh ${amount.toLocaleString()} has been saved. M-Pesa checkout is unavailable right now. Please contact info@sswomensmuseum.org for payment instructions. If you have already paid, share your receipt below.`
       });
     }
     const token = await mpesaAccessToken();
@@ -247,7 +247,7 @@ app.post('/api/donations', publicLimiter, asyncRoute(async (req, res) => {
         id: donation._id,
         reference: referenceCode,
         pending: false,
-        message: `Your PayPal pledge of $${amount} USD is recorded in the museum ledger (${referenceCode}). Add your PayPal transaction reference below to complete verification.`
+        message: `Your wish to give $${amount} has been saved. PayPal checkout is unavailable right now. Please contact info@sswomensmuseum.org for payment instructions. If you have already paid, share your receipt below.`
       });
     }
     const token = await paypalAccessToken();
@@ -275,7 +275,7 @@ app.post('/api/donations', publicLimiter, asyncRoute(async (req, res) => {
     id: donation._id,
     reference: referenceCode,
     pending: false,
-    message: `Your ${paymentMethod === 'google-pay' ? 'Google Pay' : 'Stripe'} gift pledge of $${amount} USD (${frequency}) is recorded under ${referenceCode}. Enter your payment or bank reference below for curator verification.`
+    message: `Your wish to give $${amount} has been saved. Online checkout is unavailable right now. Please contact info@sswomensmuseum.org for payment instructions. If you have already paid, share your receipt below.`
   });
 }));
 
@@ -365,18 +365,15 @@ app.post('/api/newsletter', publicLimiter, asyncRoute(async (req, res) => {
 
 app.post('/api/admin/login', adminLimiter, asyncRoute(async (req, res) => {
   const passphrase = String(req.body.password || '').trim();
-  if (!process.env.ADMIN_PASSWORD || !process.env.JWT_SECRET) return res.status(503).json({ message: 'Curator access is not configured. Set ADMIN_PASSWORD and JWT_SECRET in backend/.env.' });
+  if (!process.env.ADMIN_PASSWORD || !process.env.JWT_SECRET) return res.status(503).json({ message: 'Sign-in is unavailable. Please contact the museum team.' });
   const envPass = String(process.env.ADMIN_PASSWORD).trim();
   let passwordOk = false;
   if (envPass.startsWith('$2')) {
-    passwordOk = passphrase === envPass || await require('bcryptjs').compare(passphrase, envPass);
+    passwordOk = await require('bcryptjs').compare(passphrase, envPass);
   } else {
     passwordOk = crypto.timingSafeEqual(Buffer.from(passphrase.padEnd(256).slice(0, 256)), Buffer.from(envPass.padEnd(256).slice(0, 256))) && passphrase.length === envPass.length;
   }
-  if (!passwordOk && !isProduction && ['shestands2026', 'admin', 'admin123'].includes(passphrase.toLowerCase())) {
-    passwordOk = true;
-  }
-  if (!passwordOk) return res.status(401).json({ message: 'That password did not match. Try: shestands2026' });
+  if (!passwordOk) return res.status(401).json({ message: 'That password did not match.' });
   return res.json({ token: jwt.sign({ role: 'admin' }, process.env.JWT_SECRET, { expiresIn: '8h' }) });
 }));
 

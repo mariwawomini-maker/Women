@@ -26,9 +26,8 @@
           <p>Sign in to review support, archive stories, manage media and respond to visitors.</p>
           <form (ngSubmit)="login()">
             <label>Administrator password
-              <input type="password" [(ngModel)]="adminPassword" name="password" placeholder="Enter curator password (shestands2026)" autocomplete="current-password" required>
+              <input type="password" [(ngModel)]="adminPassword" name="password" placeholder="Enter your password" autocomplete="current-password" required>
             </label>
-            <small style="color: #686961; font-size: 11.5px;">Default curator password: <code>shestands2026</code></small>
             <button class="button button-green" type="submit">ENTER THE ARCHIVE</button>
           </form>
           @if (adminError) { <p class="form-error">{{ adminError }}</p> }
@@ -82,7 +81,7 @@
         @if (adminTab === 'donations') {
           <section class="admin-panel">
             <div class="panel-heading">
-              <div><span class="eyebrow">MONGO DB · PAYMENT LEDGER</span><h2>Donation records</h2></div>
+              <div><span class="eyebrow">CONTRIBUTION RECORDS</span><h2>Donation records</h2></div>
               <span class="status-pill">{{ adminDonations.length }} records</span>
             </div>
             <p class="panel-intro">Stripe, Google Pay and PayPal confirm successful checkout automatically. M-Pesa and manual reference receipts appear here for the museum team to reconcile before marking received.</p>
@@ -101,7 +100,7 @@
         @if (adminTab === 'media') {
           <section class="admin-panel">
             <div class="panel-heading">
-              <div><span class="eyebrow">CLOUDINARY LIBRARY</span><h2>Images, audio and files</h2></div>
+              <div><span class="eyebrow">MEDIA LIBRARY</span><h2>Images, audio and files</h2></div>
               <label class="button button-green upload-button">Add a file<input type="file" accept="image/*,audio/*,video/*,.pdf,.doc,.docx" (change)="uploadMedia($event)"></label>
             </div>
             <p class="panel-intro">Upload new museum files here, feature a homepage image, or set an oral history audio recording.</p>
@@ -122,7 +121,7 @@
                 </article>
               }
             </div>
-            @if (!adminMedia.length) { <p class="empty-state">The Cloudinary library is empty. Configure credentials and upload a file to get started.</p> }
+            @if (!adminMedia.length) { <p class="empty-state">There are no uploaded files yet.</p> }
           </section>
         }
         @if (adminTab === 'stories') {
@@ -196,8 +195,8 @@
   <!-- TOP NAVIGATION BAR (Matches PDF Header on every page) -->
   <header class="site-header">
     <a class="brand" href="#home" (click)="jump('home'); $event.preventDefault()" aria-label="She Stands Women's Museum home">
-      <strong>SHE STANDS</strong>
-      <small>WOMEN'S MUSEUM</small>
+      <span class="brand-seal" aria-hidden="true">S<span>•••</span></span>
+      <span class="brand-wordmark"><strong>SHE STANDS</strong><small>WOMEN'S MUSEUM</small></span>
     </a>
 
     <button class="menu-toggle" (click)="navOpen = !navOpen" [attr.aria-expanded]="navOpen" aria-label="Toggle navigation">
@@ -217,6 +216,7 @@
           <line x1="15.5" y1="15.5" x2="21" y2="21"></line>
         </svg>
       </button>
+      <button class="header-donate" type="button" (click)="scrollDonate()">Give to the museum <span aria-hidden="true">↗</span></button>
     </div>
   </header>
 
@@ -227,12 +227,12 @@
       <div class="hero-wash"></div>
 
       <div class="hero-copy">
-        <span class="pill-badge">PRESERVING • HONORING • EMPOWERING</span>
-        <h1>A LIVING TRIBUTE<br>TO THE WOMEN WHO<br>BUILT SOUTH SUDAN</h1>
-        <p class="hero-deck">Discover the voices, courage, culture and leadership of South Sudanese women - past, present and future.</p>
+        <span class="pill-badge">HONOUR <i></i> INSPIRE <i></i> EMPOWER</span>
+        <h1>A living tribute<br>to the women who built<br><em>South Sudan.</em></h1>
+        <p class="hero-deck">Their courage. Their stories. Our heritage.</p>
         <div class="button-row">
-          <a class="button button-clay" href="#stories" (click)="jump('stories'); $event.preventDefault()">EXPLORE HER STORIES</a>
-          <a class="button button-cream" href="#visit" (click)="jump('visit'); $event.preventDefault()">PLAN YOUR VISIT</a>
+          <a class="button button-clay" href="#stories" (click)="jump('stories'); $event.preventDefault()">Explore stories <span aria-hidden="true">→</span></a>
+          <a class="button button-cream" href="#visit" (click)="jump('visit'); $event.preventDefault()">Plan your visit <span aria-hidden="true">↗</span></a>
         </div>
       </div>
 
@@ -242,6 +242,22 @@
         <p>Women of liberation, resistance and nation-building.</p>
         <a href="#exhibitions" (click)="jump('exhibitions'); $event.preventDefault()">VIEW EXHIBITION <span>→</span></a>
       </aside>
+    </section>
+
+    <section class="home-onward" aria-label="Explore She Stands">
+      <div class="home-onward-heading"><span class="eyebrow">A MUSEUM IN MANY VOICES</span><p>Find your way in.</p></div>
+      <nav class="chapter-index" aria-label="Museum sections">
+        <a href="#stories" (click)="jump('stories'); $event.preventDefault()"><span>01 / THE PEOPLE</span><strong>Stories</strong><small>Meet the women behind the history</small><b aria-hidden="true">↗</b></a>
+        <a href="#collections" (click)="jump('collections'); $event.preventDefault()"><span>02 / THE ARCHIVE</span><strong>Collections</strong><small>Objects, images and voices</small><b aria-hidden="true">↗</b></a>
+        <a href="#exhibitions" (click)="jump('exhibitions'); $event.preventDefault()"><span>03 / THE GALLERIES</span><strong>Exhibitions</strong><small>History brought into view</small><b aria-hidden="true">↗</b></a>
+        <a href="#learn" (click)="jump('learn'); $event.preventDefault()"><span>04 / THE IDEAS</span><strong>Learn</strong><small>Resources for every generation</small><b aria-hidden="true">↗</b></a>
+        <a href="#visit" (click)="jump('visit'); $event.preventDefault()"><span>05 / THE PLACE</span><strong>Visit</strong><small>Come closer to her story</small><b aria-hidden="true">↗</b></a>
+        <a href="#involved" (click)="jump('involved'); $event.preventDefault()"><span>06 / THE FUTURE</span><strong>Take part</strong><small>Share a memory or lend a hand</small><b aria-hidden="true">↗</b></a>
+      </nav>
+      <div class="home-feature-grid">
+        <article class="home-feature-story"><img src="assets/pdf-story-1.png" alt="Women whose stories shape the museum archive"><div><span class="eyebrow">CURRENT EXHIBITION</span><h2>Daughters of the Struggle</h2><p>Women’s resolve, leadership and hope in the making of a nation.</p><a href="#exhibitions" (click)="jump('exhibitions'); $event.preventDefault()">Discover the exhibition <span aria-hidden="true">↗</span></a></div></article>
+        <article class="home-feature-support"><span class="eyebrow">STAND WITH HER STORY</span><h2>History lives when we care for it.</h2><p>Your gift helps preserve women’s voices and opens the archive to future generations.</p><button type="button" class="button button-clay" (click)="scrollDonate()">Support the museum <span aria-hidden="true">→</span></button></article>
+      </div>
     </section>
 
     <!-- PAGE 2: ABOUT THE MUSEUM -->
@@ -396,7 +412,7 @@
         <div class="exhibitions-banner-copy">
           <span class="eyebrow gold-eyebrow">EXHIBITIONS</span>
           <span class="sub-eyebrow">PRESERVING • HONORING • EMPOWERING</span>
-          <h2>THE MUSEUM, IN MANY VOICES</h2>
+          <h2>The museum, in many voices.</h2>
           <p>Permanent galleries and changing exhibitions connect personal testimony with the wider history of South Sudan.</p>
           <a class="button button-clay" href="#visit" (click)="jump('visit'); $event.preventDefault()">PLAN YOUR VISIT</a>
         </div>
@@ -426,7 +442,7 @@
     <section class="collections-pdf-section" id="collections">
       <aside class="collections-dark-sidebar">
         <span class="eyebrow gold-eyebrow underlined-gold">COLLECTIONS AND ARCHIVES</span>
-        <h2>HISTORY YOU<br>CAN SEARCH.</h2>
+        <h2>History you<br>can search.</h2>
         <p>Browse oral histories, photographs, personal papers, objects, songs and community records.</p>
 
         <label class="collection-dark-search">
@@ -560,7 +576,7 @@
         <div class="visit-banner-wash"></div>
         <div class="visit-banner-copy">
           <span class="pill-badge">VISIT AND EVENTS</span>
-          <h2>COME CLOSER<br>TO HER STORY</h2>
+          <h2>Come closer<br>to her story.</h2>
           <p>Walk through living memory, listen to first-person testimony and encounter the creativity of South Sudanese women.</p>
           <a class="button button-clay" href="https://maps.google.com/?q=Hai+Jalaba+Juba+South+Sudan" target="_blank" rel="noreferrer">GET DIRECTIONS</a>
         </div>
@@ -620,7 +636,7 @@
         </div>
         <div class="involved-bottom-clay">
           <span class="eyebrow gold-eyebrow underlined-gold">SHARE HER STORY</span>
-          <h2>A NAME.<br>A MEMORY.<br>A PLACE IN HISTORY.</h2>
+          <h2>A name.<br>A memory.<br>A place in history.</h2>
           <p>Help the museum document women whose courage, work and care shaped families, communities and the nation.</p>
           <small>Every submission is reviewed with care and consent.</small>
         </div>
@@ -689,13 +705,13 @@
       </div>
     </section>
 
-    <!-- PAGE 10: SUPPORT THE MUSEUM ("HELP HER STORY STAND.") + OFFICIAL PAYMENT LOGOS -->
+    <!-- PAGE 10: SUPPORT THE MUSEUM -->
     <section class="support-pdf-section" id="support">
       <!-- Top Cream Half (Matches Page 10 of PDF) -->
       <div class="support-top-cream">
         <div class="support-top-left">
           <span class="eyebrow underlined-eyebrow">SUPPORT THE MUSEUM</span>
-          <h2>HELP HER STORY STAND.</h2>
+          <h2>Help her story stand.</h2>
           <p>Your support protects archives, records oral histories, welcomes school groups and creates space for women’s voices.</p>
           <div class="button-row">
             <button type="button" class="button button-clay" (click)="handleSupportAction('give')">SUPPORT THE MUSEUM</button>
@@ -733,22 +749,22 @@
         <!-- Interactive Archive Support & Payment Checkout Studio (M-Pesa, Google Pay, PayPal, Stripe) -->
         <div class="donation-studio-panel" id="donation-studio">
           <div class="studio-left-info">
-            <span class="eyebrow gold-eyebrow">ARCHIVE SUPPORT CHECKOUT</span>
+            <span class="eyebrow gold-eyebrow">GIVE TO THE MUSEUM</span>
             <h3>Make a direct contribution to She Stands.</h3>
             <p>Every contribution goes directly toward oral history recording in South Sudan, archival conservation, and free school visits in Hai Jalaba.</p>
             <div class="trust-badges">
-              <span>✓ Recorded in MongoDB Ledger</span>
-              <span>✓ Instant Curator Receipt</span>
-              <span>✓ Local & International Channels</span>
+              <span>Oral histories</span>
+              <span>Collections care</span>
+              <span>School visits</span>
             </div>
           </div>
 
           <div class="studio-checkout-card">
             @if (donationState === 'form') {
               <form (ngSubmit)="makeDonation()">
-                <span class="payment-label">SELECT OFFICIAL PAYMENT CHANNEL</span>
+                <span class="payment-label">CHOOSE HOW TO GIVE</span>
                 <div class="payment-options-four" role="group" aria-label="Choose payment method">
-                  <!-- Official M-Pesa Logo -->
+                  <!-- M-Pesa payment choice -->
                   <button type="button" class="pay-tile" [class.selected]="donation.paymentMethod === 'mpesa'" (click)="choosePayment('mpesa')">
                     <svg class="brand-logo-svg" viewBox="0 0 140 38" aria-label="M-Pesa">
                       <rect x="2" y="5" width="24" height="28" rx="4" fill="#168540" />
@@ -759,7 +775,7 @@
                     <small>Safaricom · KSh</small>
                   </button>
 
-                  <!-- Official Google Pay Logo -->
+                  <!-- Google Pay payment choice -->
                   <button type="button" class="pay-tile" [class.selected]="donation.paymentMethod === 'google-pay'" (click)="choosePayment('google-pay')">
                     <svg class="brand-logo-svg" viewBox="0 0 130 38" aria-label="Google Pay">
                       <path d="M31.6 19.3c0-.9-.1-1.8-.2-2.6H19v5h7.1c-.3 1.6-1.2 3-2.6 3.9v3.2h4.2c2.5-2.3 3.9-5.7 3.9-9.5z" fill="#4285F4"/>
@@ -771,7 +787,7 @@
                     <small>Google Wallet · USD</small>
                   </button>
 
-                  <!-- Official PayPal Logo -->
+                  <!-- PayPal payment choice -->
                   <button type="button" class="pay-tile" [class.selected]="donation.paymentMethod === 'paypal'" (click)="choosePayment('paypal')">
                     <svg class="brand-logo-svg" viewBox="0 0 135 38" aria-label="PayPal">
                       <path d="M16.5 7h8.2c4.5 0 6.8 2.2 6.2 6.2-.7 4.7-3.8 7.3-8.3 7.3H19l-1.3 8.5h-4.6L16.5 7z" fill="#003087"/>
@@ -782,7 +798,7 @@
                     <small>PayPal Checkout</small>
                   </button>
 
-                  <!-- Official Stripe Logo -->
+                  <!-- Stripe payment choice -->
                   <button type="button" class="pay-tile" [class.selected]="donation.paymentMethod === 'stripe'" (click)="choosePayment('stripe')">
                     <svg class="brand-logo-svg" viewBox="0 0 130 38" aria-label="Stripe">
                       <rect x="6" y="6" width="118" height="26" rx="5" fill="#635BFF"/>
@@ -840,16 +856,16 @@
             @if (donationState === 'pending') {
               <div class="donation-confirm">
                 <span class="confirm-mark">✓</span>
-                <h3>Your gift pledge is recorded.</h3>
+                <h3>{{ manualReferenceNeeded ? 'Your gift is saved.' : 'Your payment is in progress.' }}</h3>
                 <p>{{ donationMessage }}</p>
-                <p class="reference-code">Archive Ledger Reference: <strong>{{ donationReference }}</strong></p>
-                <label>TRANSACTION / RECEIPT REFERENCE
-                  <input [(ngModel)]="donation.note" name="paymentReference" placeholder="Enter M-Pesa / Bank / Card receipt code">
-                </label>
-                <div class="button-row">
-                  <button class="button button-green" type="button" (click)="sendReference()">SUBMIT REFERENCE FOR VERIFICATION</button>
-                  <button class="button button-outline" type="button" (click)="donationState = 'form'">BACK</button>
-                </div>
+                @if (donationReference) { <p class="reference-code">Gift reference: <strong>{{ donationReference }}</strong></p> }
+                @if (manualReferenceNeeded) {
+                  <label>PAYMENT RECEIPT
+                    <input [(ngModel)]="donation.note" name="paymentReference" placeholder="Enter your receipt number">
+                  </label>
+                  <button class="button button-green" type="button" (click)="sendReference()">Send receipt for review</button>
+                }
+                <button class="button button-outline" type="button" (click)="donationState = 'form'">Back to giving options</button>
               </div>
             }
             @if (donationState === 'done') {
@@ -869,7 +885,7 @@
     <section class="news-pdf-section" id="news">
       <div class="news-header">
         <span class="eyebrow underlined-eyebrow">NEWS AND CONTACT</span>
-        <h2>WHAT IS HAPPENING AT SHE STANDS</h2>
+        <h2>What is happening at She Stands.</h2>
       </div>
 
       <div class="news-three-grid">
@@ -927,9 +943,17 @@
     </div>
     <div class="pdf-footer-right">
       <span>Supported and financed by The Achol Philip Foundation</span>
-      <a class="admin-discreet-link" href="/admin" (click)="openAdminDesk($event)">Curator Desk</a>
+      <a href="#visit" (click)="jump('visit'); $event.preventDefault()">Plan a visit ↗</a>
     </div>
   </footer>
+
+  <nav class="mobile-dock" aria-label="Quick navigation">
+    <a href="#home" [class.active]="activeNav === 'home'" (click)="jump('home'); $event.preventDefault()"><span>01</span>Home</a>
+    <a href="#stories" [class.active]="activeNav === 'stories'" (click)="jump('stories'); $event.preventDefault()"><span>02</span>Stories</a>
+    <a href="#collections" [class.active]="activeNav === 'collections'" (click)="jump('collections'); $event.preventDefault()"><span>03</span>Archive</a>
+    <a href="#support" [class.active]="activeNav === 'support'" (click)="jump('support'); $event.preventDefault()"><span>04</span>Support</a>
+    <a href="#visit" [class.active]="activeNav === 'visit'" (click)="jump('visit'); $event.preventDefault()"><span>05</span>Visit</a>
+  </nav>
 
   <!-- INTERACTIVE MODALS (Transcript, Exhibition/Resource/News Reader, Visit Booking, Global Search) -->
   @if (transcriptModalOpen) {
