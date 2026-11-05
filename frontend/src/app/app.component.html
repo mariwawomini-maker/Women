@@ -195,7 +195,7 @@
   <!-- TOP NAVIGATION BAR (Matches PDF Header on every page) -->
   <header class="site-header">
     <a class="brand" href="#home" (click)="jump('home'); $event.preventDefault()" aria-label="She Stands Women's Museum home">
-      <span class="brand-seal" aria-hidden="true">S<span>•••</span></span>
+      <img class="brand-mark" src="assets/museum-mark-v2-small.png" alt="" aria-hidden="true">
       <span class="brand-wordmark"><strong>SHE STANDS</strong><small>WOMEN'S MUSEUM</small></span>
     </a>
 
@@ -223,7 +223,7 @@
   <main>
     <!-- PAGE 1: HOME / HERO -->
     <section class="hero" id="home">
-      <img class="hero-photo" [src]="heroOverride || heroImage" alt="An elder and a young South Sudanese woman standing together in the She Stands Women's Museum gallery">
+      <img class="hero-photo" [src]="heroOverride || heroImage" alt="South Sudanese woman in a museum gallery, wearing beadwork and a red textile">
       <div class="hero-wash"></div>
 
       <div class="hero-copy">
@@ -247,16 +247,16 @@
     <section class="home-onward" aria-label="Explore She Stands">
       <div class="home-onward-heading"><span class="eyebrow">A MUSEUM IN MANY VOICES</span><p>Find your way in.</p></div>
       <nav class="chapter-index" aria-label="Museum sections">
-        <a href="#stories" (click)="jump('stories'); $event.preventDefault()"><span>01 / THE PEOPLE</span><strong>Stories</strong><small>Meet the women behind the history</small><b aria-hidden="true">↗</b></a>
-        <a href="#collections" (click)="jump('collections'); $event.preventDefault()"><span>02 / THE ARCHIVE</span><strong>Collections</strong><small>Objects, images and voices</small><b aria-hidden="true">↗</b></a>
-        <a href="#exhibitions" (click)="jump('exhibitions'); $event.preventDefault()"><span>03 / THE GALLERIES</span><strong>Exhibitions</strong><small>History brought into view</small><b aria-hidden="true">↗</b></a>
-        <a href="#learn" (click)="jump('learn'); $event.preventDefault()"><span>04 / THE IDEAS</span><strong>Learn</strong><small>Resources for every generation</small><b aria-hidden="true">↗</b></a>
-        <a href="#visit" (click)="jump('visit'); $event.preventDefault()"><span>05 / THE PLACE</span><strong>Visit</strong><small>Come closer to her story</small><b aria-hidden="true">↗</b></a>
-        <a href="#involved" (click)="jump('involved'); $event.preventDefault()"><span>06 / THE FUTURE</span><strong>Take part</strong><small>Share a memory or lend a hand</small><b aria-hidden="true">↗</b></a>
+        <a href="#stories" (click)="jump('stories'); $event.preventDefault()"><span>01 / THE PEOPLE</span><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 12c-6-4-13-4-19-2v25c7-2 13-1 19 3 6-4 12-5 19-3V10c-6-2-13-2-19 2Zm0 0v26"/></svg><strong>Stories</strong><small>Meet the women behind the history</small><b aria-hidden="true">↗</b></a>
+        <a href="#collections" (click)="jump('collections'); $event.preventDefault()"><span>02 / THE ARCHIVE</span><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M17 6h14M19 6v7c0 4-7 7-7 15 0 8 5 14 12 14s12-6 12-14c0-8-7-11-7-15V6M15 22h18M17 36h14"/></svg><strong>Collections</strong><small>Objects, images and voices</small><b aria-hidden="true">↗</b></a>
+        <a href="#exhibitions" (click)="jump('exhibitions'); $event.preventDefault()"><span>03 / THE GALLERIES</span><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M7 11v29m34-29v29M7 16c6 7 12 7 17 0 5 7 11 7 17 0M4 40h6m28 0h6M7 9a2 2 0 1 0 0 .1m34-.1a2 2 0 1 0 0 .1"/></svg><strong>Exhibitions</strong><small>History brought into view</small><b aria-hidden="true">↗</b></a>
+        <a href="#learn" (click)="jump('learn'); $event.preventDefault()"><span>04 / THE IDEAS</span><svg viewBox="0 0 48 48" aria-hidden="true"><path d="m4 17 20-9 20 9-20 9L4 17Zm8 5v10c6 6 18 6 24 0V22M44 17v15"/></svg><strong>Learn</strong><small>Resources for every generation</small><b aria-hidden="true">↗</b></a>
+        <a href="#visit" (click)="jump('visit'); $event.preventDefault()"><span>05 / THE PLACE</span><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 43s14-14 14-26a14 14 0 0 0-28 0c0 12 14 26 14 26Zm0-20a6 6 0 1 0 0-12 6 6 0 0 0 0 12Z"/></svg><strong>Visit</strong><small>Come closer to her story</small><b aria-hidden="true">↗</b></a>
+        <a href="#involved" (click)="jump('involved'); $event.preventDefault()"><span>06 / THE FUTURE</span><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M16 23a7 7 0 1 0 0-14 7 7 0 0 0 0 14Zm16 0a7 7 0 1 0 0-14 7 7 0 0 0 0 14ZM4 39c0-7 5-12 12-12s12 5 12 12M20 39c0-7 5-12 12-12s12 5 12 12"/></svg><strong>Take part</strong><small>Share a memory or lend a hand</small><b aria-hidden="true">↗</b></a>
       </nav>
       <div class="home-feature-grid">
         <article class="home-feature-story"><img src="assets/pdf-story-1.png" alt="Women whose stories shape the museum archive"><div><span class="eyebrow">CURRENT EXHIBITION</span><h2>Daughters of the Struggle</h2><p>Women’s resolve, leadership and hope in the making of a nation.</p><a href="#exhibitions" (click)="jump('exhibitions'); $event.preventDefault()">Discover the exhibition <span aria-hidden="true">↗</span></a></div></article>
-        <article class="home-feature-support"><span class="eyebrow">STAND WITH HER STORY</span><h2>History lives when we care for it.</h2><p>Your gift helps preserve women’s voices and opens the archive to future generations.</p><button type="button" class="button button-clay" (click)="scrollDonate()">Support the museum <span aria-hidden="true">→</span></button></article>
+        <article class="home-feature-support"><span class="eyebrow">STAND WITH HER STORY</span><h2>Support our mission.</h2><p>Your gift helps preserve women’s voices and opens the archive to future generations.</p><button type="button" class="button button-clay" (click)="scrollDonate()">Donate now <span aria-hidden="true">→</span></button><div class="home-payment-brands" role="group" aria-label="Choose a payment option"><button type="button" class="brand-mpesa" (click)="openDonationFor('mpesa')" aria-label="Give with M-Pesa"><span aria-hidden="true">M-PESA</span></button><button type="button" class="brand-paypal" (click)="openDonationFor('paypal')" aria-label="Give with PayPal"><span aria-hidden="true">PayPal</span></button><button type="button" class="brand-gpay" (click)="openDonationFor('google-pay')" aria-label="Give with Google Pay"><span aria-hidden="true"><b>G</b> Pay</span></button><button type="button" class="brand-stripe" (click)="openDonationFor('stripe')" aria-label="Give with Stripe"><span aria-hidden="true">stripe</span></button></div></article>
       </div>
     </section>
 
@@ -948,11 +948,11 @@
   </footer>
 
   <nav class="mobile-dock" aria-label="Quick navigation">
-    <a href="#home" [class.active]="activeNav === 'home'" (click)="jump('home'); $event.preventDefault()"><span>01</span>Home</a>
-    <a href="#stories" [class.active]="activeNav === 'stories'" (click)="jump('stories'); $event.preventDefault()"><span>02</span>Stories</a>
-    <a href="#collections" [class.active]="activeNav === 'collections'" (click)="jump('collections'); $event.preventDefault()"><span>03</span>Archive</a>
-    <a href="#support" [class.active]="activeNav === 'support'" (click)="jump('support'); $event.preventDefault()"><span>04</span>Support</a>
-    <a href="#visit" [class.active]="activeNav === 'visit'" (click)="jump('visit'); $event.preventDefault()"><span>05</span>Visit</a>
+    <a href="#home" [class.active]="activeNav === 'home'" (click)="jump('home'); $event.preventDefault()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 11 9-8 9 8v9H3v-9Zm6 9v-7h6v7"/></svg>Home</a>
+    <a href="#stories" [class.active]="activeNav === 'stories'" (click)="jump('stories'); $event.preventDefault()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6C9 4 5 4 2 5v14c4-1 7 0 10 2 3-2 6-3 10-2V5c-3-1-7-1-10 1Zm0 0v15"/></svg>Stories</a>
+    <a href="#collections" [class.active]="activeNav === 'collections'" (click)="jump('collections'); $event.preventDefault()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m2 10 10-7 10 7M4 10h16M5 19V10m5 9v-9m4 9v-9m5 9v-9M3 20h18M2 22h20"/></svg>Archive</a>
+    <a href="#support" [class.active]="activeNav === 'support'" (click)="jump('support'); $event.preventDefault()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21S2 14 2 8a5 5 0 0 1 10-1 5 5 0 0 1 10 1c0 6-10 13-10 13Z"/></svg>Support</a>
+    <a href="#visit" [class.active]="activeNav === 'visit'" (click)="jump('visit'); $event.preventDefault()"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="1"/><path d="M7 3v4m10-4v4M3 10h18m-14 4h3m4 0h3m-10 4h3"/></svg>Visit</a>
   </nav>
 
   <!-- INTERACTIVE MODALS (Transcript, Exhibition/Resource/News Reader, Visit Booking, Global Search) -->

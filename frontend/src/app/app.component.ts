@@ -53,7 +53,7 @@ export class AppComponent implements OnDestroy {
   helpOpen = false;
   activeNav = 'home';
 
-  heroImage = 'assets/pdf-hero.png';
+  heroImage = 'assets/hero-editorial-v2.png';
   heroOverride = '';
   heroAudio = '';
   siteImages: Record<string, string> = {};
@@ -725,6 +725,12 @@ export class AppComponent implements OnDestroy {
     this.showDonationStudio = true;
     this.jump('support');
     setTimeout(() => document.getElementById('donation-studio')?.scrollIntoView({ behavior: 'smooth' }), 150);
+  }
+
+  openDonationFor(method: string) {
+    this.choosePayment(method);
+    this.donationState = 'form';
+    this.scrollDonate();
   }
 
   choosePayment(method: string) {
