@@ -1,47 +1,97 @@
 @if (isAdmin) {
-  <div class="admin-shell">
-    <aside class="admin-rail">
-      <a class="brand brand-light" href="/" (click)="closeAdminDesk($event)" aria-label="She Stands public site">
-        <span><strong>SHE STANDS</strong><small>CURATOR DESK</small></span>
-      </a>
-      @if (adminToken) {
-        <p class="rail-label">Workspace</p>
-        <button class="rail-link" [class.active]="adminTab === 'overview'" (click)="adminTab = 'overview'">◫ &nbsp; Overview</button>
-        <button class="rail-link" [class.active]="adminTab === 'donations'" (click)="adminTab = 'donations'">♡ &nbsp; Donations</button>
-        <button class="rail-link" [class.active]="adminTab === 'media'" (click)="adminTab = 'media'">▧ &nbsp; Media archive</button>
-        <button class="rail-link" [class.active]="adminTab === 'stories'" (click)="adminTab = 'stories'">✎ &nbsp; Story submissions</button>
-        <button class="rail-link" [class.active]="adminTab === 'messages'" (click)="adminTab = 'messages'">✉ &nbsp; Messages</button>
-        <button class="rail-link" [class.active]="adminTab === 'socials'" (click)="adminTab = 'socials'">↗ &nbsp; Social links</button>
-      }
-      <div class="rail-bottom">
-        <a href="/" (click)="closeAdminDesk($event)">← &nbsp; View public site</a>
-        @if (adminToken) { <button (click)="logout()">Sign out</button> }
-      </div>
-    </aside>
-    <main class="admin-main">
-      @if (!adminToken) {
-        <section class="login-card">
-          <span class="eyebrow">CURATOR ACCESS</span>
-          <h1>Good work begins with listening.</h1>
-          <p>Sign in to review support, archive stories, manage media and respond to visitors.</p>
-          <form (ngSubmit)="login()">
-            <label>Administrator password
-              <input type="password" [(ngModel)]="adminPassword" name="password" placeholder="Enter your password" autocomplete="current-password" required>
-            </label>
-            <button class="button button-green" type="submit">ENTER THE ARCHIVE</button>
-          </form>
-          @if (adminError) { <p class="form-error">{{ adminError }}</p> }
-        </section>
-      } @else {
+  @if (!adminToken) {
+    <div class="curator-login-wrapper">
+      <section class="curator-login-card">
+        <div class="curator-login-header">
+          <img class="curator-logo" src="assets/museum-mark-v2-small.png" alt="She Stands Logo">
+          <span class="eyebrow gold-eyebrow">SHE STANDS WOMEN'S MUSEUM</span>
+          <h1>Make room for her story.</h1>
+          <p>One quiet place to care for the collection, support, and conversations around it.</p>
+        </div>
+
+        <form class="curator-login-form" (ngSubmit)="login()">
+          <label>Password
+            <div class="password-input-wrap">
+              <input [type]="showAdminPassword ? 'text' : 'password'" [(ngModel)]="adminPassword" name="password" placeholder="Enter your password" autocomplete="current-password" required>
+              <button type="button" class="password-toggle" (click)="showAdminPassword = !showAdminPassword" [attr.aria-label]="showAdminPassword ? 'Hide password' : 'Show password'">{{ showAdminPassword ? 'Hide' : 'Show' }}</button>
+            </div>
+          </label>
+          <button class="button button-clay-pill login-submit-btn" type="submit">Sign in</button>
+        </form>
+
+        @if (adminError) {
+          <div class="form-error-banner">{{ adminError }}</div>
+        }
+
+        <div class="curator-login-footer">
+          <a href="/" (click)="closeAdminDesk($event)">Return to the museum</a>
+        </div>
+      </section>
+    </div>
+  } @else {
+    <div class="admin-shell">
+      <aside class="admin-rail">
+        <a class="brand brand-light" href="/" (click)="closeAdminDesk($event)" aria-label="She Stands public site">
+          <img class="brand-mark" src="assets/museum-mark-v2-small.png" alt="" aria-hidden="true">
+          <span class="brand-wordmark"><strong>SHE STANDS</strong><small>CURATOR DESK</small></span>
+        </a>
+
+        <p class="curator-badge-row">Private workspace</p>
+
+        <p class="rail-label">Archive Workspace</p>
+        <button class="rail-link" [class.active]="adminTab === 'overview'" (click)="adminTab = 'overview'">
+          <span class="rail-icon">◫</span> Overview
+        </button>
+        <button class="rail-link" [class.active]="adminTab === 'donations'" (click)="adminTab = 'donations'">
+          <span class="rail-icon">♡</span> Donations Ledger
+        </button>
+        <button class="rail-link" [class.active]="adminTab === 'media'" (click)="adminTab = 'media'">
+          <span class="rail-icon">▧</span> Media Archive
+        </button>
+        <button class="rail-link" [class.active]="adminTab === 'stories'" (click)="adminTab = 'stories'">
+          <span class="rail-icon">✎</span> Story Submissions
+        </button>
+        <button class="rail-link" [class.active]="adminTab === 'messages'" (click)="adminTab = 'messages'">
+          <span class="rail-icon">✉</span> Visitor Messages
+        </button>
+        <button class="rail-link" [class.active]="adminTab === 'socials'" (click)="adminTab = 'socials'">
+          <span class="rail-icon">↗</span> Social Links
+        </button>
+
+        <div class="rail-bottom">
+          <a class="rail-home-link" href="/" (click)="closeAdminDesk($event)">← View public site</a>
+          <button class="rail-logout-btn" (click)="logout()">Sign out ⎋</button>
+        </div>
+      </aside>
+
+      <main class="admin-main">
+        <div class="admin-mobile-bar">
+          <span><img src="assets/museum-mark-v2-small.png" alt="" aria-hidden="true"><strong>She Stands</strong><small>Curator desk</small></span>
+          <button type="button" (click)="logout()">Sign out</button>
+        </div>
         <header class="admin-top">
           <div>
-            <span class="eyebrow">SHE STANDS · CURATOR DESK</span>
-            <h1>{{ adminTab === 'overview' ? 'A view of the work' : adminTab === 'donations' ? 'Support ledger' : adminTab === 'media' ? 'Media archive' : adminTab === 'stories' ? 'Stories to review' : adminTab === 'messages' ? 'Visitor conversations' : 'Social channels' }}</h1>
+            <span class="eyebrow gold-eyebrow">CURATOR DESK</span>
+            <h1>{{ adminTab === 'overview' ? 'The work at a glance' : adminTab === 'donations' ? 'Donations' : adminTab === 'media' ? 'Media library' : adminTab === 'stories' ? 'Stories to review' : adminTab === 'messages' ? 'Conversations' : 'Social channels' }}</h1>
           </div>
-          <span class="live-dot">Connected</span>
+          <div class="admin-top-actions">
+            <a href="/" class="button button-outline-pill" (click)="closeAdminDesk($event)">View museum</a>
+          </div>
         </header>
+        <nav class="admin-mobile-nav" aria-label="Curator sections">
+          <button [class.active]="adminTab === 'overview'" (click)="adminTab = 'overview'">Overview</button>
+          <button [class.active]="adminTab === 'donations'" (click)="adminTab = 'donations'">Donations</button>
+          <button [class.active]="adminTab === 'media'" (click)="adminTab = 'media'">Media</button>
+          <button [class.active]="adminTab === 'stories'" (click)="adminTab = 'stories'">Stories</button>
+          <button [class.active]="adminTab === 'messages'" (click)="adminTab = 'messages'">Messages</button>
+          <button [class.active]="adminTab === 'socials'" (click)="adminTab = 'socials'">Socials</button>
+        </nav>
+
         @if (adminNotice) {
-          <div class="notice-banner">{{ adminNotice }}<button (click)="adminNotice = ''" aria-label="Dismiss">×</button></div>
+          <div class="notice-banner">
+            <span>{{ adminNotice }}</span>
+            <button (click)="adminNotice = ''" aria-label="Dismiss notice">×</button>
+          </div>
         }
         @if (adminTab === 'overview') {
           <section class="stat-grid">
@@ -188,9 +238,9 @@
             </form>
           </section>
         }
-      }
     </main>
   </div>
+  }
 } @else {
   <!-- TOP NAVIGATION BAR (Matches PDF Header on every page) -->
   <!-- TOP NAVIGATION BAR (Matches PDF / Redesign Header) -->

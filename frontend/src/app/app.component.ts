@@ -364,6 +364,7 @@ export class AppComponent implements OnDestroy {
   // Admin state
   adminToken = sessionStorage.getItem('ss_admin_token') || '';
   adminPassword = '';
+  showAdminPassword = false;
   adminError = '';
   adminTab = 'overview';
   adminStats: any = {};
