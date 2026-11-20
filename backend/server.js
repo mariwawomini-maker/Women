@@ -49,13 +49,16 @@ const Media = mongoose.model('Media', new mongoose.Schema({
 
 const Story = mongoose.model('Story', new mongoose.Schema({
   name: { type: String, required: true, trim: true, maxlength: 120 },
+  email: { type: String, trim: true, lowercase: true, maxlength: 180 },
   place: { type: String, required: true, trim: true, maxlength: 160 },
   relationship: { type: String, required: true, maxlength: 100 },
   theme: { type: String, required: true, maxlength: 100 },
+  interviewInterest: { type: String, enum: ['yes', 'no', 'unsure'], default: 'unsure' },
   story: { type: String, required: true, maxlength: 12000 },
   consent: { type: Boolean, required: true },
   fileUrl: { type: String, default: '' },
   filePublicId: { type: String, default: '' },
+  publicationCleared: { type: Boolean, default: false },
   status: { type: String, default: 'pending', enum: ['pending', 'published', 'rejected'] }
 }, { timestamps: true }));
 
@@ -146,7 +149,8 @@ async function syncGeneratedSiteImages() {
     }
     imageMap[key] = media.secureUrl;
   }
-  await Settings.findOneAndUpdate({ key: 'public' }, { $set: { siteImages: imageMap }, $setOnInsert: { key: 'public', socials: [{ name: 'Instagram', url: 'https://www.instagram.com/sswomensmuseum.ss/' }] } }, { upsert: true, new: true, setDefaultsOnInsert: true });
+  const existing = await Settings.findOne({ key: 'public' }).lean();
+  await Settings.findOneAndUpdate({ key: 'public' }, { $set: { siteImages: { ...imageMap, ...(existing?.siteImages || {}) } }, $setOnInsert: { key: 'public', socials: [] } }, { upsert: true, new: true, setDefaultsOnInsert: true });
   console.log('Original site photographs are synced to Cloudinary.');
 }
 
@@ -197,9 +201,9 @@ app.get('/api/health', (_req, res) => res.json({ ok: true, database: mongoose.co
 app.get('/api/public/settings', asyncRoute(async (_req, res) => {
   const [settings, publishedStories] = await Promise.all([
     Settings.findOne({ key: 'public' }).lean(),
-    Story.find({ status: 'published' }).sort({ createdAt: -1 }).limit(24).lean()
+    Story.find({ status: 'published', publicationCleared: true }).select('name place theme story fileUrl').sort({ createdAt: -1 }).limit(24).lean()
   ]);
-  const defaultSocials = [{ name: 'Instagram', url: 'https://www.instagram.com/sswomensmuseum.ss/' }];
+  const defaultSocials = [];
   return res.json({
     heroImage: settings?.heroImage || '',
     heroAudio: settings?.heroAudio || '',
@@ -340,17 +344,14 @@ app.get('/api/messages/:key', publicLimiter, asyncRoute(async (req, res) => {
 app.post('/api/stories', publicLimiter, upload.single('file'), asyncRoute(async (req, res) => {
   const consent = req.body.consent === 'true';
   if (!consent) return res.status(400).json({ message: 'Please confirm that you have permission to share this material.' });
-  const fields = { name: cleanText(req.body.name, 120), place: cleanText(req.body.place, 160), relationship: cleanText(req.body.relationship, 100), theme: cleanText(req.body.theme, 100), story: cleanText(req.body.story, 12000), consent };
-  if (Object.values(fields).some((value) => !value)) return res.status(400).json({ message: 'Complete all the story fields before sending.' });
+  const fields = { name: cleanText(req.body.name, 120), email: cleanText(req.body.email, 180).toLowerCase(), place: cleanText(req.body.place, 160), relationship: cleanText(req.body.relationship, 100), theme: cleanText(req.body.theme, 100), interviewInterest: ['yes', 'no', 'unsure'].includes(req.body.interviewInterest) ? req.body.interviewInterest : 'unsure', story: cleanText(req.body.story, 12000), consent };
+  if (!fields.name || !validEmail(fields.email) || !fields.place || !fields.relationship || !fields.theme || !fields.story) return res.status(400).json({ message: 'Complete all the story fields, including a valid contact email.' });
   let fileUrl = ''; let filePublicId = '';
   if (req.file) {
-    if (cloudinaryReady()) {
-      const uploaded = await putInCloudinary(req.file);
-      fileUrl = uploaded.secure_url;
-      filePublicId = uploaded.public_id;
-    } else {
-      filePublicId = `local-${Date.now()}-${cleanText(req.file.originalname, 60)}`;
-    }
+    if (!cloudinaryReady()) return res.status(503).json({ message: 'File uploads are temporarily unavailable. Please submit the story without a file or try again later.' });
+    const uploaded = await putInCloudinary(req.file);
+    fileUrl = uploaded.secure_url;
+    filePublicId = uploaded.public_id;
   }
   const story = await Story.create({ ...fields, fileUrl, filePublicId });
   return res.status(201).json({ id: story._id, status: story.status });
@@ -361,6 +362,12 @@ app.post('/api/newsletter', publicLimiter, asyncRoute(async (req, res) => {
   if (!validEmail(email)) return res.status(400).json({ message: 'Enter a valid email address.' });
   await Subscriber.updateOne({ email }, { $setOnInsert: { email } }, { upsert: true });
   return res.status(201).json({ subscribed: true });
+}));
+app.post('/api/newsletter/unsubscribe', publicLimiter, asyncRoute(async (req, res) => {
+  const email = cleanText(req.body.email, 180).toLowerCase();
+  if (!validEmail(email)) return res.status(400).json({ message: 'Enter a valid email address.' });
+  await Subscriber.deleteOne({ email });
+  return res.json({ received: true });
 }));
 
 app.post('/api/admin/login', adminLimiter, asyncRoute(async (req, res) => {
@@ -419,7 +426,8 @@ app.get('/api/admin/stories', requireAdmin, asyncRoute(async (_req, res) => res.
 app.patch('/api/admin/stories/:id', requireAdmin, asyncRoute(async (req, res) => {
   const status = ['published', 'rejected', 'pending'].includes(req.body.status) ? req.body.status : '';
   if (!status) return res.status(400).json({ message: 'Choose a valid review status.' });
-  const story = await Story.findByIdAndUpdate(req.params.id, { status }, { new: true });
+  if (status === 'published' && req.body.publicationCleared !== true) return res.status(400).json({ message: 'Confirm identity, consent, rights and context before publishing.' });
+  const story = await Story.findByIdAndUpdate(req.params.id, { status, publicationCleared: status === 'published' }, { new: true });
   if (!story) return res.status(404).json({ message: 'Story not found.' });
   return res.json({ status: story.status });
 }));
@@ -438,6 +446,17 @@ app.post('/api/admin/messages/:id/reply', requireAdmin, asyncRoute(async (req, r
 
 app.put('/api/admin/settings', requireAdmin, asyncRoute(async (req, res) => {
   const patch = {};
+  if (req.body.siteImages && typeof req.body.siteImages === 'object' && !Array.isArray(req.body.siteImages)) {
+    const allowedSlots = new Set(['homeFeature', 'gallery01', 'gallery02', 'gallery03', 'gallery04', 'gallery05', 'collectionPhotographs', 'collectionObjects', 'collectionDocuments', 'collectionOralHistories', 'learning', 'visit']);
+    const siteImages = {};
+    for (const [key, value] of Object.entries(req.body.siteImages)) {
+      if (!allowedSlots.has(key) || typeof value !== 'string') return res.status(400).json({ message: 'Choose a valid page image position.' });
+      const url = cleanText(value, 1200);
+      if (url && !isSafeUrl(url)) return res.status(400).json({ message: 'Use a secure https image URL.' });
+      siteImages[key] = url;
+    }
+    patch.siteImages = siteImages;
+  }
   if (typeof req.body.heroImage === 'string') {
     const url = cleanText(req.body.heroImage, 1200);
     if (url && !isSafeUrl(url)) return res.status(400).json({ message: 'Use a secure https image URL.' });
@@ -455,7 +474,7 @@ app.put('/api/admin/settings', requireAdmin, asyncRoute(async (req, res) => {
     patch.socials = socials;
   }
   const settings = await Settings.findOneAndUpdate({ key: 'public' }, { $set: patch, $setOnInsert: { key: 'public' } }, { new: true, upsert: true, setDefaultsOnInsert: true });
-  return res.json({ heroImage: settings.heroImage, heroAudio: settings.heroAudio, socials: settings.socials });
+  return res.json({ heroImage: settings.heroImage, heroAudio: settings.heroAudio, siteImages: settings.siteImages, socials: settings.socials });
 }));
 
 app.use((error, _req, res, _next) => {

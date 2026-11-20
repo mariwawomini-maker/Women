@@ -2,6 +2,14 @@
 
 An Angular frontend and a Node/Express/MongoDB API for the museum website, curator dashboard, donations, media, story submissions and visitor messages. The folders deploy independently from this repository.
 
+## Museum content and publishing
+
+The public navigation, five museum spaces, collections, learning, research, visitor information, support, shop, press and contact sections follow the supplied *Museum Standard Website Content Master*. The homepage keeps a compact mobile sequence with a story feature, six section cards, a support card and the four payment logos.
+
+The document leaves institutional dates, heroine biographies, collection counts and provenance, event dates, opening hours, admission fees, product prices and some contact details unconfirmed. The site does not publish invented values for them. Community submissions appear only after a curator confirms identity, consent, rights and context; the public API returns their story content without contributor email addresses. Previously approved submissions need that clearance before appearing again. Confirm the Hai Gabat address, public phone number and social URLs with museum leadership before treating them as final.
+
+The curator media library can place uploaded images in the homepage feature, five gallery cards, four collection cards, education and visit sections. Media positions and approved social links persist in the API. An attached story file requires Cloudinary to be available; otherwise the visitor receives an error instead of a false success message.
+
 ## Deploy the API on Render
 
 The root `render.yaml` defines a Node web service using `backend` as its root directory, `npm ci` as its build command, `npm start` as its start command and `/api/health` as its health check. You can use the Blueprint or create a web service with the same settings.

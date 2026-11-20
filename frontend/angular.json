@@ -17,8 +17,8 @@
             "browser": "src/main.ts",
             "polyfills": ["zone.js"],
             "tsConfig": "tsconfig.app.json",
-            "assets": ["src/assets"],
-            "styles": ["src/styles.css"]
+            "assets": ["src/assets", "src/robots.txt", "src/sitemap.xml"],
+            "styles": ["src/styles.css", "src/museum-redesign.css"]
           },
           "configurations": {
             "production": {
