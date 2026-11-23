@@ -4,13 +4,13 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
 const projectDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const rawApiUrl = process.env.PUBLIC_API_BASE_URL?.trim() || 'https://she-stands-museum.onrender.com';
-let apiUrlOrigin = 'https://she-stands-museum.onrender.com';
+const rawApiUrl = process.env.PUBLIC_API_BASE_URL?.trim() || 'https://women-gt20.onrender.com';
+let apiUrlOrigin = 'https://women-gt20.onrender.com';
 try {
   const apiUrl = new URL(rawApiUrl);
   apiUrlOrigin = apiUrl.origin;
 } catch {
-  apiUrlOrigin = 'https://she-stands-museum.onrender.com';
+  apiUrlOrigin = 'https://women-gt20.onrender.com';
 }
 
 const npmCli = process.env.npm_execpath;
