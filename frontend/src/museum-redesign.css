@@ -1,10 +1,9 @@
 /* ==========================================================================
-   SHE STANDS WOMEN’S MUSEUM — EDITORIAL PUBLIC SITE, 4 PAYMENT PAGES & DESK
+   SHE STANDS WOMEN’S MUSEUM — EDITORIAL PUBLIC SITE, PAYMENT PAGES & DESK
    ========================================================================== */
 
 body:has(.museum-v2),
 body:has(.pay-hub-page),
-body:has(.pay-mpesa-page),
 body:has(.pay-paypal-page),
 body:has(.pay-gpay-page),
 body:has(.pay-card-page) {
@@ -14,7 +13,6 @@ body:has(.pay-card-page) {
 
 ss-root:has(.museum-v2),
 ss-root:has(.pay-hub-page),
-ss-root:has(.pay-mpesa-page),
 ss-root:has(.pay-paypal-page),
 ss-root:has(.pay-gpay-page),
 ss-root:has(.pay-card-page) {
@@ -208,7 +206,7 @@ ss-root:has(.pay-card-page) {
   align-items: center;
 }
 .museum-hero-picture { position: absolute; inset: 0; width: 100%; height: 100%; }
-.museum-hero-image { width: 100%; height: 100%; object-fit: cover; object-position: right 22%; }
+.museum-hero-image { width: 100%; height: 100%; object-fit: cover; object-position: center 22%; }
 .museum-hero-shade {
   position: absolute;
   inset: 0;
@@ -381,7 +379,7 @@ ss-root:has(.pay-card-page) {
   font-size: 13px;
   font-weight: 700;
 }
-.museum-home-payments { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; width: min(47%, 520px); }
+.museum-home-payments { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; width: min(44%, 440px); }
 .museum-home-payments a {
   display: grid;
   place-items: center;
@@ -806,7 +804,7 @@ ss-root:has(.pay-card-page) {
 .museum-donation .museum-eyebrow { color: var(--v2-clay); }
 .museum-donation-head h3 { margin: 8px 0; color: var(--v2-green); font: 500 32px/1.08 var(--serif); }
 .museum-donation-head p { color: #4d5f50; font-size: 14px; line-height: 1.5; }
-.museum-payment-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 20px 0; }
+.museum-payment-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 20px 0; }
 .museum-payment-grid a {
   display: flex;
   flex-direction: column;
@@ -965,7 +963,7 @@ ss-root:has(.pay-card-page) {
 .transcript-body-text { white-space: pre-line; line-height: 1.75; color: #243b2c; font-size: 15px; }
 
 /* ==========================================================================
-   5 DISTINCT PAYMENT EXPERIENCES (/donate, /mpesa, /paypal, /google-pay, /card)
+   DISTINCT PAYMENT EXPERIENCES (/donate, /paypal, /google-pay, /card)
    ========================================================================== */
 
 .pay-setup-notice {
@@ -999,7 +997,7 @@ ss-root:has(.pay-card-page) {
 .pay-hub-intro { max-width: 680px; margin-bottom: 34px; }
 .pay-hub-intro h1 { margin: 12px 0; color: #0e3020; font: 500 clamp(38px, 4.5vw, 62px)/1.02 var(--serif); letter-spacing: -0.04em; }
 .pay-hub-intro p { margin: 0; color: #4c5f50; font-size: 16.5px; line-height: 1.6; }
-.pay-hub-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.pay-hub-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
 .pay-hub-card {
   display: flex;
   flex-direction: column;
@@ -1011,7 +1009,6 @@ ss-root:has(.pay-card-page) {
   transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s;
 }
 .pay-hub-card:hover { transform: translateY(-3px); box-shadow: 0 18px 40px rgba(15, 44, 29, 0.1); }
-.pay-hub-mpesa:hover { border-color: #168639; }
 .pay-hub-paypal:hover { border-color: #0070ba; }
 .pay-hub-gpay:hover { border-color: #1f1f1f; }
 .pay-hub-cardstripe:hover { border-color: #635bff; }
@@ -1038,96 +1035,7 @@ ss-root:has(.pay-card-page) {
 .pay-hub-other strong { display: block; font: 600 20px var(--serif); color: #123624; margin-bottom: 4px; }
 .pay-hub-other p { margin: 0; color: #4b5d4e; font-size: 14px; }
 
-/* --- 1. /donate/mpesa — SAFARICOM MOBILE MONEY DESIGN --- */
-.pay-mpesa-page { min-height: 100vh; background: #eef6f0; color: #12311f; }
-.mpesa-green-ribbon {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 14px clamp(20px, 5vw, 64px);
-  background: #0d6a2d;
-  color: #fff;
-}
-.mpesa-brand-link { display: inline-flex; align-items: center; gap: 10px; font-weight: 700; font-size: 14px; color: #fff; }
-.mpesa-brand-link img { width: 34px; height: 34px; object-fit: contain; background: #fff; border-radius: 50%; padding: 3px; }
-.mpesa-ribbon-right { display: flex; align-items: center; gap: 16px; font-size: 13px; }
-.mpesa-currency-pill { padding: 4px 10px; border-radius: 999px; background: rgba(255, 255, 255, 0.16); font-weight: 600; }
-.mpesa-ribbon-right a { color: #d8f5df; text-decoration: underline; }
-
-.mpesa-shell {
-  display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
-  gap: 32px;
-  align-items: start;
-  width: min(1120px, 100%);
-  margin: 0 auto;
-  padding: 40px 24px 72px;
-}
-.mpesa-form-card { padding: 32px; border: 1px solid #cde2d3; border-radius: 16px; background: #fff; box-shadow: 0 18px 42px rgba(13, 106, 45, 0.08); }
-.mpesa-card-head { display: flex; align-items: center; gap: 18px; padding-bottom: 22px; margin-bottom: 22px; border-bottom: 1px solid #e6f0e8; }
-.mpesa-logo-badge { height: 48px; width: auto; object-fit: contain; }
-.mpesa-kicker { color: #0e7c34; font-size: 11px; font-weight: 800; letter-spacing: 0.14em; }
-.mpesa-card-head h1 { margin: 4px 0 0; color: #0b2d18; font: 600 32px/1.1 var(--serif); }
-
-.mpesa-form { display: grid; gap: 16px; }
-.mpesa-preset-label { font-size: 13px; font-weight: 700; color: #1c442a; }
-.mpesa-presets { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
-.mpesa-presets button { min-height: 44px; border: 1.5px solid #c9dec9; border-radius: 8px; background: #f8fcf9; color: #124022; font-weight: 700; font-size: 13.5px; }
-.mpesa-presets button.active { border-color: #0e7c34; background: #0e7c34; color: #fff; }
-.mpesa-form label { display: grid; gap: 6px; font-size: 13px; font-weight: 700; color: #1c442a; }
-.mpesa-form label small { font-weight: 400; color: #546d5b; font-size: 12px; }
-.mpesa-prefix-field { display: flex; align-items: center; border: 1.5px solid #c3d9c8; border-radius: 8px; overflow: hidden; background: #fff; }
-.mpesa-prefix-field span { padding: 0 14px; background: #eaf4ec; color: #0d6a2d; font-weight: 800; font-size: 14px; align-self: stretch; display: grid; place-items: center; border-right: 1px solid #c3d9c8; }
-.mpesa-prefix-field input { border: 0 !important; flex: 1; }
-.mpesa-form input, .mpesa-form select { min-height: 46px; padding: 10px 13px; border: 1.5px solid #c3d9c8; border-radius: 8px; font-size: 15px; color: #102e1b; background: #fff; }
-.mpesa-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.mpesa-submit-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 50px;
-  padding: 12px 22px;
-  border: 0;
-  border-radius: 8px;
-  background: #0e7c34;
-  color: #fff;
-  font-size: 15px;
-  font-weight: 800;
-}
-.mpesa-submit-btn:hover:not(:disabled) { background: #0a5f27; }
-.mpesa-submit-btn:disabled { opacity: 0.45; cursor: not-allowed; }
-
-.mpesa-handset-guide { display: grid; gap: 22px; }
-.mpesa-phone-mockup {
-  width: min(300px, 100%);
-  margin: 0 auto;
-  padding: 14px;
-  border-radius: 28px;
-  background: #14221a;
-  box-shadow: 0 20px 44px rgba(10, 35, 20, 0.24);
-}
-.phone-notch { width: 76px; height: 6px; margin: 0 auto 12px; border-radius: 99px; background: #2d4135; }
-.phone-screen { padding: 22px 18px; border-radius: 18px; background: #1d3226; color: #f2faf4; text-align: center; display: grid; gap: 10px; }
-.phone-carrier { color: #6ee093; font-size: 10px; font-weight: 800; letter-spacing: 0.16em; }
-.phone-screen strong { font-size: 17px; }
-.phone-screen p { margin: 0; font-size: 13px; color: #cfe2d4; line-height: 1.45; }
-.phone-pin-dots { display: flex; justify-content: center; gap: 10px; padding: 8px; border-radius: 8px; background: rgba(255, 255, 255, 0.08); font-size: 20px; color: #6ee093; }
-.phone-cta-mock { padding: 8px; border-radius: 6px; background: #0e7c34; font-size: 12px; font-weight: 700; }
-
-.mpesa-steps { list-style: none; margin: 0; padding: 22px; border: 1px solid #d0e3d5; border-radius: 12px; background: #fff; display: grid; gap: 14px; }
-.mpesa-steps li { display: grid; gap: 3px; }
-.mpesa-steps strong { color: #0e5a28; font-size: 14px; }
-.mpesa-steps span { color: #4a6352; font-size: 13px; line-height: 1.45; }
-.mpesa-waiting-box { display: grid; gap: 14px; }
-.mpesa-pulse-badge { justify-self: start; padding: 5px 11px; border-radius: 999px; background: #e3f6e8; color: #0c6c2d; font-size: 11px; font-weight: 800; letter-spacing: 0.1em; }
-.mpesa-paybill-box { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 14px; border-radius: 8px; background: #f2faf4; border: 1px solid #c5e1cd; }
-.mpesa-paybill-box span { display: block; font-size: 11px; color: #4c6855; }
-.mpesa-receipt-submit { display: grid; gap: 10px; }
-.pay-switch-strip { display: flex; flex-wrap: wrap; gap: 12px; font-size: 13px; color: #496251; justify-content: center; }
-.pay-switch-strip a { color: #0d6a2d; font-weight: 700; text-decoration: underline; }
-
-/* --- 2. /donate/paypal — INTERNATIONAL PAYPAL DESIGN --- */
+/* --- 1. /donate/paypal — INTERNATIONAL PAYPAL DESIGN --- */
 .pay-paypal-page { min-height: 100vh; background: #f1f5fa; color: #162a45; }
 .paypal-navy-bar {
   display: flex;
@@ -1447,7 +1355,7 @@ ss-root:has(.pay-card-page) {
   .museum-intro, .museum-mission-grid, .community-wall-section, .museum-share-layout,
   .museum-learning-layout, .teacher-resources-strip, .museum-visit,
   .museum-support-layout, .museum-contact, .closing-statement-band,
-  .pay-hub-grid, .mpesa-shell, .card-patronage-grid { grid-template-columns: 1fr; }
+  .pay-hub-grid, .card-patronage-grid { grid-template-columns: 1fr; }
   .closing-statement-band { flex-direction: column; align-items: flex-start; }
   .museum-press-note { flex-direction: column; align-items: flex-start; }
   .museum-service-list, .museum-standards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -1478,19 +1386,19 @@ ss-root:has(.pay-card-page) {
   .museum-home-feature { grid-template-columns: 1fr; }
   .museum-home-feature img { height: 210px; }
   .museum-quick-links { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .museum-home-payments { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .museum-home-payments { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .museum-payment-grid { grid-template-columns: 1fr; }
   .values-nine-grid, .principles-list, .museum-collection-grid, .museum-published-grid,
   .museum-service-list, .museum-standards-grid, .museum-visit-details,
-  .museum-form-grid, .curator-field-grid, .mpesa-two-col, .paypal-grid,
+  .museum-form-grid, .curator-field-grid, .paypal-grid,
   .paypal-handoff-steps, .card-two-col, .timeline-list li { grid-template-columns: 1fr; }
   .museum-gallery-grid { display: grid; grid-template-columns: 1fr; }
   .museum-gallery-card, .museum-gallery-card:nth-child(4), .museum-gallery-card:nth-child(5) { grid-column: auto; }
-  .mpesa-presets, .paypal-amounts, .gpay-amount-pills { grid-template-columns: repeat(2, 1fr); }
+  .paypal-amounts, .gpay-amount-pills { grid-template-columns: repeat(2, 1fr); }
   .card-amount-grid { grid-template-columns: repeat(3, 1fr); }
   .museum-footer { grid-template-columns: 1fr; }
   .museum-chat-button span { display: none; }
   .museum-chat-button { width: 48px; height: 48px; padding: 0; justify-content: center; }
   .pay-hub-other { flex-direction: column; align-items: flex-start; }
-  .mpesa-green-ribbon, .paypal-navy-bar, .card-slate-bar { flex-wrap: wrap; }
-  .mpesa-currency-pill { display: none; }
+  .paypal-navy-bar, .card-slate-bar { flex-wrap: wrap; }
 }

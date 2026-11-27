@@ -12,10 +12,14 @@ const cloudinary = require('cloudinary').v2;
 
 const app = express();
 const PORT = Number(process.env.PORT || 4000);
-const rawFrontendOrigins = String(process.env.FRONTEND_URL || 'http://localhost:4200')
-  .split(',')
-  .map((item) => item.trim().replace(/\/$/, ''))
-  .filter(Boolean);
+const rawFrontendOrigins = [...new Set([
+  ...String(process.env.FRONTEND_URL || 'http://localhost:4200')
+    .split(',')
+    .map((item) => item.trim().replace(/\/$/, ''))
+    .filter(Boolean),
+  'https://sswomensmuseum.org',
+  'https://www.sswomensmuseum.org'
+])];
 const PRIMARY_FRONTEND_URL = rawFrontendOrigins[0] || 'http://localhost:4200';
 const isProduction = process.env.NODE_ENV === 'production';
 
@@ -285,15 +289,6 @@ async function paypalAccessToken() {
   const response = await fetch(`${paypalBase()}/v1/oauth2/token`, { method: 'POST', headers: { Authorization: `Basic ${auth}`, 'Content-Type': 'application/x-www-form-urlencoded' }, body: 'grant_type=client_credentials' });
   const data = await response.json(); if (!response.ok) throw Object.assign(new Error('PayPal could not start checkout.'), { status: 502 }); return data.access_token;
 }
-function mpesaBase() { return process.env.MPESA_ENV === 'production' ? 'https://api.safaricom.co.ke' : 'https://sandbox.safaricom.co.ke'; }
-function mpesaStkConfigured() { return Boolean(process.env.MPESA_CONSUMER_KEY && process.env.MPESA_CONSUMER_SECRET && process.env.MPESA_SHORTCODE && process.env.MPESA_PASSKEY && process.env.MPESA_CALLBACK_URL); }
-function mpesaPaybillConfigured() { return Boolean(cleanText(process.env.MPESA_PAYBILL_NUMBER, 40)); }
-function mpesaConfigured() { return mpesaStkConfigured() || mpesaPaybillConfigured(); }
-async function mpesaAccessToken() {
-  const auth = Buffer.from(`${process.env.MPESA_CONSUMER_KEY}:${process.env.MPESA_CONSUMER_SECRET}`).toString('base64');
-  const response = await fetch(`${mpesaBase()}/oauth/v1/generate?grant_type=client_credentials`, { headers: { Authorization: `Basic ${auth}` } });
-  const data = await response.json(); if (!response.ok) throw Object.assign(new Error('M-Pesa could not start checkout.'), { status: 502 }); return data.access_token;
-}
 
 function cleanText(value, max = 4000) { return String(value || '').trim().slice(0, max); }
 function validEmail(value) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value || '')); }
@@ -441,10 +436,6 @@ app.get('/api/public/content', asyncRoute(async (_req, res) => {
 }));
 
 app.get('/api/public/payment-options', (_req, res) => res.json({
-  mpesa: mpesaConfigured(),
-  mpesaMode: mpesaStkConfigured() ? 'stk' : mpesaPaybillConfigured() ? 'paybill' : 'unavailable',
-  mpesaPaybill: mpesaPaybillConfigured() ? cleanText(process.env.MPESA_PAYBILL_NUMBER, 40) : '',
-  mpesaAccountName: mpesaPaybillConfigured() ? cleanText(process.env.MPESA_ACCOUNT_NAME || process.env.MPESA_ACCOUNT_REFERENCE || 'SHE STANDS', 60) : '',
   paypal: paypalConfigured(),
   'google-pay': Boolean(stripeClient()),
   stripe: Boolean(stripeClient())
@@ -462,71 +453,25 @@ app.post('/api/donations', publicLimiter, asyncRoute(async (req, res) => {
   if (!checkHoneypot(req.body)) return res.status(400).json({ message: 'Unable to process request.' });
   const name = cleanText(req.body.name, 120);
   const email = cleanText(req.body.email, 180).toLowerCase();
-  const paymentMethod = ['stripe', 'google-pay', 'mpesa', 'paypal'].includes(req.body.paymentMethod) ? req.body.paymentMethod : 'stripe';
-  const currency = paymentMethod === 'mpesa' ? 'kes' : 'usd';
+  const paymentMethod = ['stripe', 'google-pay', 'paypal'].includes(req.body.paymentMethod) ? req.body.paymentMethod : 'stripe';
+  const currency = 'usd';
   const amount = Number(req.body.amount);
-  const maxAmount = currency === 'kes' ? 5000000 : 100000;
+  const maxAmount = 100000;
   const frequency = req.body.frequency === 'monthly' && (paymentMethod === 'stripe' || paymentMethod === 'google-pay') ? 'monthly' : 'once';
   const designation = cleanText(req.body.designation, 120) || 'General museum care';
   const dedication = cleanText(req.body.dedication, 240);
   const rawPhone = cleanText(req.body.phone, 40);
 
   if (!name || !validEmail(email) || !Number.isFinite(amount) || amount < 1 || amount > maxAmount) {
-    return res.status(400).json({ message: `Enter your name, a valid email and a gift amount between ${currency === 'kes' ? 'KSh 1' : '$1'} and ${currency === 'kes' ? 'KSh 5,000,000' : '$100,000'}.` });
+    return res.status(400).json({ message: 'Enter your name, a valid email and a gift amount between $1 and $100,000.' });
   }
-  if ((paymentMethod === 'mpesa' && !mpesaConfigured()) || (paymentMethod === 'paypal' && !paypalConfigured()) || ((paymentMethod === 'stripe' || paymentMethod === 'google-pay') && !stripeClient())) {
+  if ((paymentMethod === 'paypal' && !paypalConfigured()) || ((paymentMethod === 'stripe' || paymentMethod === 'google-pay') && !stripeClient())) {
     return res.status(503).json({ message: 'This payment method is currently awaiting live merchant credentials. Please choose another available method or send a donation enquiry.' });
   }
 
   const referenceCode = `SSWM-${new Date().getFullYear()}-${crypto.randomBytes(3).toString('hex').toUpperCase()}`;
   const donation = await Donation.create({ name, email, amount, currency, frequency, paymentMethod, designation, dedication, phone: rawPhone, providerReference: referenceCode });
   await incrementAnalytics('donation_starts', paymentMethod);
-
-  if (paymentMethod === 'mpesa') {
-    const phone = String(rawPhone || '').replace(/[\s()+-]/g, '');
-    const normalizedPhone = phone.startsWith('0') ? `254${phone.slice(1)}` : phone;
-    if (!/^254[17]\d{8}$/.test(normalizedPhone)) {
-      await Donation.findByIdAndDelete(donation._id);
-      return res.status(400).json({ message: 'Enter a valid Kenyan M-Pesa mobile number, such as 0712 345 678 or 254712345678.' });
-    }
-    donation.phone = normalizedPhone;
-    if (mpesaStkConfigured()) {
-      const token = await mpesaAccessToken();
-      const timestamp = new Date().toISOString().replace(/[-T:.Z]/g, '').slice(0, 14);
-      const shortcode = process.env.MPESA_SHORTCODE;
-      const password = Buffer.from(`${shortcode}${process.env.MPESA_PASSKEY}${timestamp}`).toString('base64');
-      const response = await fetch(`${mpesaBase()}/mpesa/stkpush/v1/processrequest`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          BusinessShortCode: shortcode, Password: password, Timestamp: timestamp,
-          TransactionType: process.env.MPESA_TRANSACTION_TYPE || 'CustomerPayBillOnline',
-          Amount: Math.round(amount), PartyA: normalizedPhone, PartyB: shortcode, PhoneNumber: normalizedPhone,
-          CallBackURL: process.env.MPESA_CALLBACK_URL,
-          AccountReference: (process.env.MPESA_ACCOUNT_REFERENCE || 'SHE STANDS').slice(0, 12),
-          TransactionDesc: 'Museum donation'
-        })
-      });
-      const result = await response.json();
-      if (!response.ok || result.ResponseCode !== '0') {
-        await Donation.findByIdAndUpdate(donation._id, { status: 'failed' });
-        return res.status(502).json({ message: result.errorMessage || 'M-Pesa could not send the prompt to your phone.' });
-      }
-      donation.providerReference = result.CheckoutRequestID || referenceCode;
-      await donation.save();
-      return res.status(201).json({
-        id: donation._id, reference: donation.providerReference, pending: true,
-        message: 'An M-Pesa payment prompt has been sent to your phone. Enter your M-Pesa PIN to complete your gift. Your receipt will be reconciled by our finance desk.'
-      });
-    }
-    await donation.save();
-    return res.status(201).json({
-      id: donation._id, reference: referenceCode, pending: false,
-      paybill: cleanText(process.env.MPESA_PAYBILL_NUMBER, 40),
-      accountName: cleanText(process.env.MPESA_ACCOUNT_NAME || process.env.MPESA_ACCOUNT_REFERENCE || 'SHE STANDS', 60),
-      message: 'Complete the transfer via M-Pesa Paybill and enter your M-Pesa confirmation code below so our team can verify your gift.'
-    });
-  }
 
   if (paymentMethod === 'paypal') {
     const token = await paypalAccessToken();
@@ -602,25 +547,6 @@ app.post('/api/donations/paypal/capture', publicLimiter, asyncRoute(async (req, 
     return res.json({ status: 'paid', amount: donation.amount, currency: donation.currency, designation: donation.designation });
   }
   return res.status(202).json({ status: 'pending' });
-}));
-
-app.post('/api/donations/mpesa/callback', asyncRoute(async (req, res) => {
-  const result = req.body?.Body?.stkCallback;
-  if (result?.CheckoutRequestID) {
-    const donation = await Donation.findOne({ providerReference: result.CheckoutRequestID, paymentMethod: 'mpesa' });
-    if (donation) {
-      if (Number(result.ResultCode) === 0) {
-        const metadata = result.CallbackMetadata?.Item || [];
-        const receipt = metadata.find((item) => item.Name === 'MpesaReceiptNumber')?.Value;
-        donation.status = 'review';
-        donation.paymentReference = receipt ? String(receipt) : result.CheckoutRequestID;
-      } else {
-        donation.status = 'failed';
-      }
-      await donation.save();
-    }
-  }
-  return res.json({ ResultCode: 0, ResultDesc: 'Accepted' });
 }));
 
 app.post('/api/donations/:id/reference', publicLimiter, asyncRoute(async (req, res) => {
@@ -814,19 +740,6 @@ app.get('/api/admin/payment-status', requireAdmin, (_req, res) => res.json({
     missing: [
       ...(!process.env.PAYPAL_CLIENT_ID ? ['PAYPAL_CLIENT_ID'] : []),
       ...(!process.env.PAYPAL_CLIENT_SECRET ? ['PAYPAL_CLIENT_SECRET'] : [])
-    ]
-  },
-  mpesa: {
-    configured: mpesaConfigured(),
-    stkConfigured: mpesaStkConfigured(),
-    paybillConfigured: mpesaPaybillConfigured(),
-    mode: process.env.MPESA_ENV === 'production' ? 'live' : 'sandbox',
-    missing: [
-      ...(!process.env.MPESA_CONSUMER_KEY ? ['MPESA_CONSUMER_KEY'] : []),
-      ...(!process.env.MPESA_CONSUMER_SECRET ? ['MPESA_CONSUMER_SECRET'] : []),
-      ...(!process.env.MPESA_SHORTCODE ? ['MPESA_SHORTCODE'] : []),
-      ...(!process.env.MPESA_PASSKEY ? ['MPESA_PASSKEY'] : []),
-      ...(!process.env.MPESA_CALLBACK_URL ? ['MPESA_CALLBACK_URL'] : [])
     ]
   },
   cloudinary: {

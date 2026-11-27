@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /admin
 
-Sitemap: https://women-y22.pages.dev/sitemap.xml
+Sitemap: https://sswomensmuseum.org/sitemap.xml

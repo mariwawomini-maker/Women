@@ -167,10 +167,6 @@
               </div>
               <div class="readiness-grid">
                 <article class="readiness-card">
-                  <div class="readiness-head"><strong>M-PESA (Daraja)</strong><span class="status-pill" [class.paid]="paymentStatus.mpesa?.configured">{{ paymentStatus.mpesa?.stkConfigured ? 'STK active' : paymentStatus.mpesa?.paybillConfigured ? 'Paybill active' : 'Setup required' }}</span></div>
-                  <small>{{ paymentStatus.mpesa?.configured ? ('Environment: ' + paymentStatus.mpesa.mode) : ('Add on Render: ' + paymentStatus.mpesa?.missing?.join(', ')) }}</small>
-                </article>
-                <article class="readiness-card">
                   <div class="readiness-head"><strong>PayPal Orders v2</strong><span class="status-pill" [class.paid]="paymentStatus.paypal?.configured">{{ paymentStatus.paypal?.configured ? ('Active (' + paymentStatus.paypal.mode + ')') : 'Setup required' }}</span></div>
                   <small>{{ paymentStatus.paypal?.configured ? 'International USD checkout enabled.' : ('Add on Render: ' + paymentStatus.paypal?.missing?.join(', ')) }}</small>
                 </article>
@@ -256,7 +252,6 @@
               </select>
               <select [(ngModel)]="donationMethodFilter" aria-label="Filter by payment method">
                 <option value="all">All payment methods</option>
-                <option value="mpesa">M-PESA</option>
                 <option value="paypal">PayPal</option>
                 <option value="google-pay">Google Pay</option>
                 <option value="stripe">Card (Stripe)</option>
@@ -793,17 +788,6 @@
           <p>Each payment method opens its own dedicated checkout experience suited to its currency, verification steps and security standards.</p>
         </div>
         <div class="pay-hub-grid">
-          <a class="pay-hub-card pay-hub-mpesa" href="/donate/mpesa" (click)="navigateTo('/donate/mpesa', $event)">
-            <div class="pay-hub-logo"><img src="assets/payment-mpesa.png" alt="M-PESA"></div>
-            <span class="pay-hub-tag">KENYA MOBILE MONEY · KES</span>
-            <h2>Give with M-PESA</h2>
-            <p>Instant Safaricom STK Push prompt sent directly to your mobile handset, with receipt reconciliation in the museum ledger.</p>
-            <div class="pay-hub-foot">
-              <span class="pay-status-dot" [class.live]="paymentOptions.mpesa"></span>
-              <span>{{ paymentOptions.mpesa ? 'Active' : 'Awaiting Daraja activation' }}</span>
-              <b>Open M-PESA →</b>
-            </div>
-          </a>
           <a class="pay-hub-card pay-hub-paypal" href="/donate/paypal" (click)="navigateTo('/donate/paypal', $event)">
             <div class="pay-hub-logo"><img src="assets/payment-paypal.png" alt="PayPal"></div>
             <span class="pay-hub-tag">INTERNATIONAL · USD</span>
@@ -845,140 +829,6 @@
           </div>
           <button type="button" class="museum-solid-button" (click)="openEnquiryModal('donation', 'Donation & Sponsorship Enquiry')">Send donation enquiry</button>
         </div>
-      </main>
-    </div>
-  } @else if (donationSlug === 'mpesa') {
-    <!-- /donate/mpesa — DEDICATED SAFARICOM M-PESA MOBILE MONEY EXPERIENCE -->
-    <div class="pay-mpesa-page">
-      <div class="mpesa-green-ribbon">
-        <a class="mpesa-brand-link" href="/" (click)="navigateTo('/', $event)">
-          <img src="assets/museum-mark-v2-small.png" alt="">
-          <span>She Stands Women’s Museum</span>
-        </a>
-        <div class="mpesa-ribbon-right">
-          <span class="mpesa-currency-pill">Currency: Kenyan Shillings (KES)</span>
-          <a href="/donate" (click)="navigateTo('/donate', $event)">Other methods</a>
-        </div>
-      </div>
-
-      <main class="mpesa-shell">
-        <section class="mpesa-form-card">
-          <div class="mpesa-card-head">
-            <img class="mpesa-logo-badge" src="assets/payment-mpesa.png" alt="M-PESA">
-            <div>
-              <span class="mpesa-kicker">SAFARICOM MOBILE GIVING</span>
-              <h1>Give via M-PESA</h1>
-            </div>
-          </div>
-
-          @if (paymentOptions.mpesa === false) {
-            <div class="pay-setup-notice" role="status">
-              <strong>M-PESA live gateway is pending Safaricom Daraja activation.</strong>
-              <p>Once the museum’s Safaricom shortcode and passkey are active on the server, STK prompts will trigger immediately on your phone. In the meantime, you may choose another active method or submit a donation enquiry.</p>
-              <button type="button" class="pay-alt-link" (click)="openEnquiryModal('donation', 'M-PESA & Mobile Donation Enquiry')">Request direct museum payment details →</button>
-            </div>
-          }
-
-          @if (donationState === 'form') {
-            <form class="mpesa-form" (ngSubmit)="makeDonation()">
-              <input type="text" [(ngModel)]="donation._hp" name="hp" class="sr-only" tabindex="-1" autocomplete="off" aria-hidden="true">
-              <div class="mpesa-preset-label">Select gift amount (KES)</div>
-              <div class="mpesa-presets">
-                @for (amt of [1000, 2500, 5000, 10000]; track amt) {
-                  <button type="button" [class.active]="donation.amount === amt" (click)="donation.amount = amt">KSh {{ amt | number }}</button>
-                }
-              </div>
-
-              <label>Custom amount (KSh)
-                <div class="mpesa-prefix-field">
-                  <span>KSh</span>
-                  <input type="number" min="1" max="5000000" [(ngModel)]="donation.amount" name="mpesaAmount" required>
-                </div>
-              </label>
-
-              <label>Safaricom M-PESA phone number
-                <div class="mpesa-prefix-field">
-                  <span>+254</span>
-                  <input type="tel" [(ngModel)]="donation.phone" name="mpesaPhone" placeholder="0712 345 678" autocomplete="tel" required>
-                </div>
-                <small>Enter your Kenyan Safaricom number (07xx or 01xx). Keep your phone unlocked.</small>
-              </label>
-
-              <div class="mpesa-two-col">
-                <label>Your full name<input [(ngModel)]="donation.name" name="mpesaName" autocomplete="name" required></label>
-                <label>Email for receipt<input type="email" [(ngModel)]="donation.email" name="mpesaEmail" autocomplete="email" required></label>
-              </div>
-
-              <label>Direct your support
-                <select [(ngModel)]="donation.designation" name="mpesaDesignation">
-                  @for (fund of donationDesignations; track fund) { <option [value]="fund">{{ fund }}</option> }
-                </select>
-              </label>
-
-              <button type="submit" class="mpesa-submit-btn" [disabled]="donationSubmitting || paymentOptions.mpesa === false">
-                {{ donationSubmitting ? 'Sending prompt to phone…' : ('Send M-PESA prompt for KSh ' + (donation.amount | number)) }}
-              </button>
-
-              @if (donationMessage) { <p class="pay-error-note" role="alert">{{ donationMessage }}</p> }
-            </form>
-          }
-
-          @if (donationState === 'pending') {
-            <div class="mpesa-waiting-box">
-              <span class="mpesa-pulse-badge">WAITING FOR HANDSET CONFIRMATION</span>
-              <h2>{{ manualReferenceNeeded ? 'Complete via M-PESA Paybill' : 'Check your phone now.' }}</h2>
-              <p>{{ donationMessage }}</p>
-              @if (donationPaybill) {
-                <div class="mpesa-paybill-box">
-                  <div><span>Paybill / Business No.</span><strong>{{ donationPaybill }}</strong></div>
-                  <div><span>Account Name</span><strong>{{ donationAccountName }}</strong></div>
-                  <div><span>Amount</span><strong>KSh {{ donation.amount | number }}</strong></div>
-                </div>
-              }
-              @if (donationReference) { <p class="mpesa-ref-line">Museum reference: <strong>{{ donationReference }}</strong></p> }
-              @if (manualReferenceNeeded) {
-                <div class="mpesa-receipt-submit">
-                  <label>M-PESA SMS Confirmation Code<input [(ngModel)]="donation.note" name="mpesaCode" placeholder="e.g. TJK84L9P2M"></label>
-                  <button type="button" class="mpesa-submit-btn" (click)="sendReference()">Submit M-PESA code for verification</button>
-                </div>
-              }
-              <button type="button" class="museum-text-button" (click)="donationState = 'form'">Start a new M-PESA gift</button>
-            </div>
-          }
-
-          @if (donationState === 'done') {
-            <div class="mpesa-waiting-box">
-              <span class="mpesa-pulse-badge">RECEIVED FOR RECONCILIATION</span>
-              <h2>Asante — thank you for standing with the museum.</h2>
-              <p>{{ donationMessage }}</p>
-              <a class="mpesa-submit-btn" href="/" (click)="navigateTo('/', $event)">Return to She Stands Museum</a>
-            </div>
-          }
-        </section>
-
-        <aside class="mpesa-handset-guide">
-          <div class="mpesa-phone-mockup">
-            <div class="phone-notch"></div>
-            <div class="phone-screen">
-              <span class="phone-carrier">SAFARICOM M-PESA</span>
-              <strong>STK Push Prompt</strong>
-              <p>Do you want to pay <b>KSh {{ donation.amount | number }}</b> to <b>She Stands Women’s Museum</b>?</p>
-              <div class="phone-pin-dots"><span>•</span><span>•</span><span>•</span><span>•</span></div>
-              <span class="phone-cta-mock">Enter M-PESA PIN &amp; OK</span>
-            </div>
-          </div>
-          <ol class="mpesa-steps">
-            <li><strong>1. Enter your amount &amp; phone number</strong><span>Gifts are processed in Kenyan Shillings (KES).</span></li>
-            <li><strong>2. Approve on your handset</strong><span>Safaricom sends an encrypted SIM Toolkit prompt directly to your screen.</span></li>
-            <li><strong>3. Museum ledger verification</strong><span>Your M-PESA receipt code arrives in the Curator Desk for reconciliation and acknowledgement.</span></li>
-          </ol>
-          <div class="pay-switch-strip">
-            <span>Switch method:</span>
-            <a href="/donate/paypal" (click)="navigateTo('/donate/paypal', $event)">PayPal</a>
-            <a href="/donate/google-pay" (click)="navigateTo('/donate/google-pay', $event)">Google Pay</a>
-            <a href="/donate/card" (click)="navigateTo('/donate/card', $event)">Debit / Credit Card</a>
-          </div>
-        </aside>
       </main>
     </div>
   } @else if (donationSlug === 'paypal') {
@@ -1068,7 +918,6 @@
           <footer class="paypal-sheet-footer">
             <span>Prefer another method?</span>
             <div>
-              <a href="/donate/mpesa" (click)="navigateTo('/donate/mpesa', $event)">M-PESA</a>
               <a href="/donate/google-pay" (click)="navigateTo('/donate/google-pay', $event)">Google Pay</a>
               <a href="/donate/card" (click)="navigateTo('/donate/card', $event)">Card</a>
             </div>
@@ -1150,7 +999,6 @@
             }
 
             <div class="gpay-switch-bar">
-              <a href="/donate/mpesa" (click)="navigateTo('/donate/mpesa', $event)">M-PESA</a>
               <a href="/donate/paypal" (click)="navigateTo('/donate/paypal', $event)">PayPal</a>
               <a href="/donate/card" (click)="navigateTo('/donate/card', $event)">Debit / Credit Card</a>
             </div>
@@ -1190,7 +1038,6 @@
 
           <div class="card-sidebar-switch">
             <span>Other methods:</span>
-            <a href="/donate/mpesa" (click)="navigateTo('/donate/mpesa', $event)">M-PESA</a>
             <a href="/donate/paypal" (click)="navigateTo('/donate/paypal', $event)">PayPal</a>
             <a href="/donate/google-pay" (click)="navigateTo('/donate/google-pay', $event)">Google Pay</a>
           </div>
@@ -1367,7 +1214,7 @@
       <section class="museum-hero" id="home" aria-labelledby="museum-hero-title">
         <picture class="museum-hero-picture">
           <source media="(max-width: 640px)" [srcset]="heroOverride || mobileHeroImage">
-          <img class="museum-hero-image" [src]="heroOverride || heroImage" alt="South Sudanese woman in woven cloth and traditional beadwork standing inside a portrait gallery">
+          <img class="museum-hero-image" [src]="heroOverride || heroImage" alt="Two generations of South Sudanese women standing among sculpted heroine busts inside She Stands Women’s Museum">
         </picture>
         <div class="museum-hero-shade"></div>
         <div class="museum-hero-copy">
@@ -1400,7 +1247,7 @@
 
         <div class="museum-featured-pair">
           <a class="museum-home-feature" href="#heroines" (click)="jump('heroines'); $event.preventDefault()">
-            <img [src]="featuredHeroine?.imageUrl || siteImages['homeFeature'] || 'assets/daughters-feature-v2.jpg'" [alt]="featuredHeroine?.title || 'Archival portrait of two generations of South Sudanese women'">
+            <img [src]="featuredHeroine?.imageUrl || siteImages['homeFeature'] || 'assets/real-home-story.jpg'" [alt]="featuredHeroine?.title || 'Two generations of South Sudanese women holding hands before sculpted heroine busts at She Stands Women’s Museum'">
             <span>
               <small>FEATURED HEROINE</small>
               <strong>{{ featuredHeroine?.title || 'Every life opens a wider chapter' }}</strong>
@@ -1410,7 +1257,7 @@
           </a>
 
           <a class="museum-home-feature" href="#collections" (click)="jump('collections'); $event.preventDefault()">
-            <img [src]="featuredCollection?.imageUrl || siteImages['collectionObjects'] || 'assets/hero-mobile-v2.jpg'" [alt]="featuredCollection?.title || 'Traditional beadwork, textiles and archival prints'">
+            <img [src]="featuredCollection?.imageUrl || siteImages['collectionObjects'] || 'assets/real-col-objects.jpg'" [alt]="featuredCollection?.title || 'Hand-painted South Sudanese craft bowls, carvings and cultural objects at She Stands Women’s Museum'">
             <span>
               <small>FEATURED COLLECTION</small>
               <strong>{{ featuredCollection?.title || 'Objects carry stories' }}</strong>
@@ -1437,7 +1284,6 @@
             <a class="support-hub-cta" href="/donate" (click)="navigateTo('/donate', $event)">Compare ways to give →</a>
           </div>
           <div class="museum-home-payments" aria-label="Dedicated payment methods">
-            <a href="/donate/mpesa" (click)="navigateTo('/donate/mpesa', $event)" aria-label="Give with M-PESA"><img src="assets/payment-mpesa.png" alt="M-PESA"></a>
             <a href="/donate/paypal" (click)="navigateTo('/donate/paypal', $event)" aria-label="Give with PayPal"><img src="assets/payment-paypal.png" alt="PayPal"></a>
             <a href="/donate/google-pay" (click)="navigateTo('/donate/google-pay', $event)" aria-label="Give with Google Pay"><img src="assets/payment-google-pay.png" alt="Google Pay"></a>
             <a href="/donate/card" (click)="navigateTo('/donate/card', $event)" aria-label="Give by debit or credit card via Stripe"><img src="assets/payment-stripe.png" alt="Stripe"></a>
@@ -1771,7 +1617,7 @@
         </div>
 
         <div class="museum-learning-layout">
-          <img [src]="siteImages['learning'] || 'assets/pdf-oral-history.png'" alt="Archival documents, photographs and notebooks laid out on a museum study table" loading="lazy">
+          <img [src]="siteImages['learning'] || 'assets/real-learning-school.jpg'" alt="Achol Philip Foundation and She Stands Women’s Museum educators engaging students during the Mangaten school visit" loading="lazy">
           <div>
             <h3>School visits &amp; learning programmes</h3>
             <p>Visits include guided gallery tours, object-based learning, age-appropriate discussions, reflection activities and structured educational resources.</p>
@@ -1848,7 +1694,7 @@
             <button type="button" class="museum-outline-button" (click)="openEnquiryModal('school-visit', 'School & Group Booking Form')">School &amp; Group Booking</button>
           </div>
         </div>
-        <img [src]="siteImages['visit'] || 'assets/pdf-story-4.png'" alt="Visitors standing inside the She Stands Women’s Museum gallery" loading="lazy">
+        <img [src]="siteImages['visit'] || 'assets/real-visit-gallery.jpg'" alt="Visitors touring the She Stands Women’s Museum gallery alongside sculpted South Sudanese heritage busts" loading="lazy">
         <ng-container *ngTemplateOutlet="museumEntries; context: {$implicit: contentFor('visit')}"></ng-container>
       </section>
 
@@ -1916,7 +1762,6 @@
               <p>Each payment method opens its own tailored giving page for its currency and confirmation steps.</p>
             </div>
             <div class="museum-payment-grid" aria-label="Choose a payment method">
-              <a href="/donate/mpesa" (click)="navigateTo('/donate/mpesa', $event)" aria-label="Give with M-PESA"><img src="assets/payment-mpesa.png" alt="M-PESA"><span>M-PESA · KES</span></a>
               <a href="/donate/paypal" (click)="navigateTo('/donate/paypal', $event)" aria-label="Give with PayPal"><img src="assets/payment-paypal.png" alt="PayPal"><span>PayPal · USD</span></a>
               <a href="/donate/google-pay" (click)="navigateTo('/donate/google-pay', $event)" aria-label="Give with Google Pay"><img src="assets/payment-google-pay.png" alt="Google Pay"><span>Google Pay · USD</span></a>
               <a href="/donate/card" (click)="navigateTo('/donate/card', $event)" aria-label="Give by debit or credit card via Stripe"><img src="assets/payment-stripe.png" alt="Stripe"><span>Card · USD</span></a>

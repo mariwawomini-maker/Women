@@ -140,18 +140,14 @@ export class AppComponent {
 
   // Payment gateway availability
   paymentOptions: any = {
-    mpesa: undefined,
-    mpesaMode: 'unavailable',
-    mpesaPaybill: '',
-    mpesaAccountName: '',
     paypal: undefined,
     'google-pay': undefined,
     stripe: undefined
   };
 
   // Visual assets & editable copy
-  heroImage = 'assets/hero-editorial-v2.png';
-  mobileHeroImage = 'assets/hero-mobile-v2.jpg';
+  heroImage = 'assets/real-hero-desktop.jpg';
+  mobileHeroImage = 'assets/real-hero-mobile.jpg';
   heroOverride = '';
   heroAudio = '';
   siteImages: Record<string, string> = {};
@@ -292,14 +288,11 @@ export class AppComponent {
     phone: '',
     _hp: ''
   };
-  manualReferenceNeeded = false;
   donationSubmitting = false;
   donationState: 'form' | 'pending' | 'done' = 'form';
   donationMessage = '';
   donationReference = '';
   donationId = '';
-  donationPaybill = '';
-  donationAccountName = '';
 
   // Floating Visitor Messages Chat
   messageForm = {
@@ -437,9 +430,13 @@ export class AppComponent {
     this.isDonationPage = pathname.startsWith('/donate');
     this.donationSlug = this.isDonationPage ? (pathname.split('/')[2] || '') : '';
     if (this.isDonationPage) {
+      if (this.donationSlug && !['paypal', 'google-pay', 'card'].includes(this.donationSlug)) {
+        window.history.replaceState({}, '', '/donate');
+        this.donationSlug = '';
+      }
       const method = this.donationSlug === 'card'
         ? 'stripe'
-        : ['mpesa', 'paypal', 'google-pay'].includes(this.donationSlug)
+        : ['paypal', 'google-pay'].includes(this.donationSlug)
           ? this.donationSlug
           : 'stripe';
       this.choosePayment(method);
@@ -743,9 +740,7 @@ export class AppComponent {
   choosePayment(method: string) {
     this.donation.paymentMethod = method;
     this.donation.frequency = method === 'stripe' || method === 'google-pay' ? this.donation.frequency : 'once';
-    if (method === 'mpesa') this.donation.amount = 2500;
-    else if (method === 'google-pay') this.donation.amount = 35;
-    else if (method === 'paypal') this.donation.amount = 50;
+    if (method === 'google-pay') this.donation.amount = 35;
     else this.donation.amount = 50;
   }
 
@@ -763,26 +758,12 @@ export class AppComponent {
         }
         this.donationReference = result.reference || result.id;
         this.donationMessage = result.message;
-        this.donationPaybill = result.paybill || '';
-        this.donationAccountName = result.accountName || '';
-        this.manualReferenceNeeded = result.pending === false;
         this.donationState = 'pending';
       },
       error: (error) => {
         this.donationSubmitting = false;
         this.donationMessage = error.error?.message || 'Online checkout is temporarily unavailable. You can use our Donation Enquiry form or write to info@sswomensmuseum.org.';
       }
-    });
-  }
-
-  sendReference() {
-    if (!this.donation.note.trim()) return;
-    this.http.post<any>(`${this.api}/donations/${this.donationId}/reference`, { reference: this.donation.note }).subscribe({
-      next: () => {
-        this.donationState = 'done';
-        this.donationMessage = 'Thank you. Your M-Pesa confirmation code is queued for reconciliation in the Curator Ledger.';
-      },
-      error: (error) => (this.donationMessage = error.error?.message || 'We could not send that reference. Please try again.')
     });
   }
 
